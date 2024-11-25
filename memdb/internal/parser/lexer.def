@@ -1,0 +1,4 @@
+#define QUERY(name) {#name, Lexer::##name}
+
+QUERY(ABA),
+QUERY(ZZZ)
