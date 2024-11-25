@@ -2,6 +2,7 @@
 #include <string_view>
 #include <string>
 #include <map>
+#include "objects.cpp"
 /*
 create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)
 
@@ -23,10 +24,35 @@ update users set login = login + "_deleted", is_admin = false where password_has
 
 delete users where |login| % 2 = 0
 
-create ordered index on users by login create unordered index on users by is_admin
+create ordered index on users by login
+create unordered index on users by is_admin
 */
 
 namespace memdb {
+
+using namespace parser;
+
+struct Lexer {
+    std::map<std::string, Command> s2c = {
+        {"create", Command::CREATE}, {"insert", Command::CREATE}, {"select", Command::CREATE}, {"update", Command::CREATE}, {"delete", Command::CREATE}, 
+        {"join", Command::CREATE}
+    };
+
+    std::map<std::string, SubCommand> s2sc = {
+        {"where", SubCommand::WHERE}, {"on", SubCommand::ON}, {"set", SubCommand::SET}, {"from", SubCommand::FROM}, {"index", SubCommand::INDEX}
+    };
+
+    std::map<std::string, Attribute> s2a = {
+        {"unique", Attribute::UNIQUE}, {"autoincrement", Attribute::AUTOINCREMENT}, {"key", Attribute::KEY}, {"ordered", Attribute::ORDERED},
+        {"unordered", Attribute::UNORDERED}
+    };
+
+    std::map<std::string, Operation> s2op = {
+        {"+", Operation::PLUS}, {"-", Operation::MINUS}, {"*", Operation::MULTIPLY}, {"/", Operation::DIVIDE}, {"%", Operation::MOD}, {"=", Operation::EQ}, 
+        {"<", Operation::LESS}, {">", Operation::MORE}, {"<=", Operation::EQLESS}, {">=", Operation::EQMORE}, {"!=", Operation::NOTEQ}, {"&&", Operation::AND}, 
+        {"||", Operation::OR}, {"!", Operation::NOT}, {"XOR", Operation::XOR}, {"|", Operation::LEN}
+    };
+};
 
 class Parser {
     Parser() = default;
@@ -52,17 +78,8 @@ class Parser {
     }
 };
 
-enum class Lexer {
-    ABA,
-    ZZZ
-};
-
-std::map<std::string, Lexer> m = {
-#include "lexer.def"
-};
-
 }
 
 int main() {
-    std::map<int, int> v = {{1, 2}, {3, 4}};
+
 }

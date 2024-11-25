@@ -8,10 +8,44 @@ namespace memdb {
 enum class Type {
     Int32,
     Bool,
-    Byte,
+    Bytes,
     String,
     Empty,
 };
+
+enum class Operation {
+    PLUS,
+    MINUS,
+    MULTIPLY,
+    DIVIDE,
+    MOD,
+    EQ,
+    LESS,
+    MORE,
+    EQLESS,
+    EQMORE,
+    NOTEQ,
+    AND,
+    OR,
+    NOT,
+    XOR,
+    LEN
+};
+
+bool IsBoolOp(Operation op) {
+    static std::vector<Operation> bOps = {Operation::AND, Operation::OR, Operation::NOT, Operation::XOR};
+    return (std::find(bOps.begin(), bOps.end(), op) != bOps.end());
+}
+
+bool IsMathOp(Operation op) {
+    static std::vector<Operation> mOps = {Operation::PLUS, Operation::MINUS, Operation::MULTIPLY, Operation::DIVIDE, Operation::MOD};
+    return (std::find(mOps.begin(), mOps.end(), op) != mOps.end());
+}
+
+bool IsCmpOp(Operation op) {
+    static std::vector<Operation> cOps = {Operation::EQ, Operation::LESS, Operation::MORE, Operation::EQLESS, Operation::EQMORE, Operation::NOTEQ};
+    return (std::find(cOps.begin(), cOps.end(), op) != cOps.end());
+}
 
 // TODO можно сделать класс не виртуальным чтобы не создавать лишний раз vtable
 
@@ -19,6 +53,33 @@ class DbType {
 public:
     virtual Type getType()=0;
     virtual ~DbType()=default;
+
+
+    static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> right) {
+        if (left->getType() != right->getType()) {
+            // throw ex - types must be eq
+            exit(-1);
+        }
+        if (left->getType() == Type::Empty) {
+            // throw ex - types must be not empty
+            exit(-1);
+        }
+
+        switch (left->getType())
+        {
+        case Type::Int32:
+            return dynamic_cast<DbInt32*>(left.get())->doOp(op, dynamic_cast<DbInt32*>(right.get()));
+        case Type::Bool:
+            return dynamic_cast<DbBool*>(left.get())->doOp(op, dynamic_cast<DbBool*>(right.get()));
+        case Type::Bytes:
+            return dynamic_cast<DbBytes*>(left.get())->doOp(op, dynamic_cast<DbBytes*>(right.get()));
+        case Type::String:
+            return dynamic_cast<DbString*>(left.get())->doOp(op, dynamic_cast<DbString*>(right.get()));
+        default:
+            // throw ex - unexp type used in operation
+            break;
+        }
+    }
 };
 
 class DbTypeEmpty : public DbType {
@@ -36,6 +97,46 @@ public:
     int32_t get() {
         return x;
     }
+
+    bool doOp(Operation op, const DbInt32* another) { // update cur
+        switch (op)
+        {
+        case Operation::PLUS:
+            x += another->x;
+            break;
+        case Operation::MINUS:
+            x -= another->x;
+            break;
+        case Operation::MULTIPLY:
+            x *= another->x;
+            break;
+        case Operation::DIVIDE:
+            if (another->x == 0) {
+                // throw ex divide by 0
+                exit(-1);
+            }
+            x /= another->x;
+            break;
+        case Operation::MOD:
+        if (another->x == 0) {
+                // throw ex MOD 0
+                exit(-1);
+            }
+            x %= another->x;
+            break;
+        case Operation::LESS:
+            return (x < another->x);
+            break;
+        case Operation::MORE:
+            return (x > another->x);
+            break;
+        default:
+            // throw ex - bad op
+            exit(-1);
+            break;
+        }
+        return false;
+    }
 private:
     int32_t x;
 };
@@ -49,19 +150,38 @@ public:
     bool get() {
         return x;
     }
+
+    bool doOp(Operation op, const DbBool* another) { // update cur
+        // throw err
+        exit(-1);
+        return true;
+    }
 private:
     bool x;
 };
 
 class DbBytes : public DbType {
+public:
     Type getType() {
-        return Type::Byte;
+        return Type::Bytes;
+    }
+    bool doOp(Operation op, const DbBytes* another) { // update cur
+        // throw err
+        exit(-1);
+        return true;
     }
 };
 
 class DbString : public DbType {
+public:
     Type getType() {
         return Type::String;
+    }
+
+    bool doOp(Operation op, const DbString* another) { // update cur
+        // throw err
+        exit(-1);
+        return true;
     }
 };
 
