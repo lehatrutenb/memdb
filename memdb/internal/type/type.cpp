@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <memory>
 
 namespace memdb {
 
@@ -47,39 +48,18 @@ bool IsCmpOp(Operation op) {
     return (std::find(cOps.begin(), cOps.end(), op) != cOps.end());
 }
 
+bool IsNonDefCmpOp(Operation op) {
+    static std::vector<Operation> cOps = {Operation::EQ, Operation::EQLESS, Operation::EQMORE, Operation::NOTEQ};
+    return (std::find(cOps.begin(), cOps.end(), op) != cOps.end());
+}
+
 // TODO можно сделать класс не виртуальным чтобы не создавать лишний раз vtable
 
 class DbType {
 public:
     virtual Type getType()=0;
+    virtual std::shared_ptr<DbType> Copy()=0;
     virtual ~DbType()=default;
-
-
-    static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> right) {
-        if (left->getType() != right->getType()) {
-            // throw ex - types must be eq
-            exit(-1);
-        }
-        if (left->getType() == Type::Empty) {
-            // throw ex - types must be not empty
-            exit(-1);
-        }
-
-        switch (left->getType())
-        {
-        case Type::Int32:
-            return dynamic_cast<DbInt32*>(left.get())->doOp(op, dynamic_cast<DbInt32*>(right.get()));
-        case Type::Bool:
-            return dynamic_cast<DbBool*>(left.get())->doOp(op, dynamic_cast<DbBool*>(right.get()));
-        case Type::Bytes:
-            return dynamic_cast<DbBytes*>(left.get())->doOp(op, dynamic_cast<DbBytes*>(right.get()));
-        case Type::String:
-            return dynamic_cast<DbString*>(left.get())->doOp(op, dynamic_cast<DbString*>(right.get()));
-        default:
-            // throw ex - unexp type used in operation
-            break;
-        }
-    }
 };
 
 class DbTypeEmpty : public DbType {
@@ -96,6 +76,12 @@ public:
     }
     int32_t get() {
         return x;
+    }
+
+    std::shared_ptr<DbType> Copy() {
+        std::shared_ptr<DbType> copy;
+        copy.reset(dynamic_cast<DbType*>(new DbInt32(x)));
+        return copy;
     }
 
     bool doOp(Operation op, const DbInt32* another) { // update cur
@@ -151,6 +137,12 @@ public:
         return x;
     }
 
+    std::shared_ptr<DbType> Copy() {
+        std::shared_ptr<DbType> copy;
+        copy.reset(dynamic_cast<DbType*>(new DbBool(x)));
+        return copy;
+    }
+
     bool doOp(Operation op, const DbBool* another) { // update cur
         // throw err
         exit(-1);
@@ -162,20 +154,43 @@ private:
 
 class DbBytes : public DbType {
 public:
+    DbBytes(std::vector<char> v_) : v(v_){};
+    std::vector<char> get() {
+        return v;
+    }
     Type getType() {
         return Type::Bytes;
     }
+
+    std::shared_ptr<DbType> Copy() {
+        std::shared_ptr<DbType> copy;
+        copy.reset(dynamic_cast<DbType*>(new DbBytes(v)));
+        return copy;
+    }
+
     bool doOp(Operation op, const DbBytes* another) { // update cur
         // throw err
         exit(-1);
         return true;
     }
+private:
+    std::vector<char> v;
 };
 
 class DbString : public DbType {
 public:
+    DbString(std::string s_) : s(s_){};
+    std::string get() {
+        return s;
+    }
     Type getType() {
         return Type::String;
+    }
+
+    std::shared_ptr<DbType> Copy() {
+        std::shared_ptr<DbType> copy;
+        copy.reset(dynamic_cast<DbType*>(new DbString(s)));
+        return copy;
     }
 
     bool doOp(Operation op, const DbString* another) { // update cur
@@ -183,7 +198,59 @@ public:
         exit(-1);
         return true;
     }
+private:
+    std::string s;
 };
+
+
+
+static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> right) {
+    if (left->getType() != right->getType()) {
+        // throw ex - types must be eq
+        exit(-1);
+    }
+    if (left->getType() == Type::Empty) {
+        // throw ex - types must be not empty
+        exit(-1);
+    }
+
+    if (left->getType() != Type::String && left->getType() != Type::Bytes && IsNonDefCmpOp(op)) {
+        switch (op)
+        {
+        case Operation::EQ:
+            return DoOp(Operation::LESS, left, right) == 0 && DoOp(Operation::MORE, left, right) == 0;
+        case Operation::NOTEQ:
+            return DoOp(Operation::LESS, left, right) == 1 || DoOp(Operation::MORE, left, right) == 1;
+        case Operation::EQLESS:
+            return DoOp(Operation::MORE, left, right) == 0;
+        case Operation::EQMORE:
+            return DoOp(Operation::LESS, left, right) == 0;
+        }
+    }
+
+    switch (left->getType())
+    {
+    case Type::Int32:
+        return dynamic_cast<DbInt32*>(left.get())->doOp(op, dynamic_cast<DbInt32*>(right.get()));
+    case Type::Bool:
+        if (op == Operation::NOT) {
+            return dynamic_cast<DbBool*>(left.get())->doOp(op, nullptr);
+        }
+        return dynamic_cast<DbBool*>(left.get())->doOp(op, dynamic_cast<DbBool*>(right.get()));
+    case Type::Bytes:
+        return dynamic_cast<DbBytes*>(left.get())->doOp(op, dynamic_cast<DbBytes*>(right.get()));
+    case Type::String:
+        if (op == Operation::LEN) {
+                return dynamic_cast<DbString*>(left.get())->doOp(op, nullptr);
+        }
+        return dynamic_cast<DbString*>(left.get())->doOp(op, dynamic_cast<DbString*>(right.get()));
+    default:
+        // throw ex - unexp type used in operation
+        exit(-1);
+        break;
+    }
+}
+
 
 template<typename T>
 class DbTypeMassoP {
@@ -300,6 +367,7 @@ private:
     std::unordered_map<ssize_t, T> v;
     ssize_t sz;
 };
+
 }
 
 /*
