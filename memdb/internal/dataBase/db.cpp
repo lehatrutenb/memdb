@@ -89,13 +89,11 @@ int main() {
     std::vector<ColumnDescription> colDescripts2 = {ColumnDescription({ColumnAttrs::Default}, "column1")};
     db.CreateTable(tName2, colTps2, colDescripts);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(123)));
+    std::shared_ptr<DbType> value{new DbInt32(123)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("table1", to_add);
 
-    std::shared_ptr<DbType> value2;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(321)));
+    std::shared_ptr<DbType> value2{new DbInt32(321)};
     std::vector<Table::Value> to_add2 = {Table::Value(value2)};
     db.Insert("table2", to_add);
 }

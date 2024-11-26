@@ -47,13 +47,11 @@ TEST(CheckCreateColumn, 0) {
     std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
     db.CreateTable(tName, colTps, colDescripts);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(123)));
+    std::shared_ptr<DbType> value{new DbInt32(123)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("column1", to_add);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(321)));
+    std::shared_ptr<DbType> value{new DbInt32(321)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("column2", to_add);
 }
@@ -70,13 +68,11 @@ TEST(CheckCreateManeColumnsManyTables, 1) {
     std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
     db.CreateTable(tName, colTps, colDescripts);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(123)));
+    std::shared_ptr<DbType> value{new DbInt32(123)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("column1", to_add);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(321)));
+    std::shared_ptr<DbType> value{new DbInt32(321)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("column2", to_add);
 }
@@ -89,13 +85,11 @@ TEST(CheckZeroNamedColumn, 3) {
     std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
     db.CreateTable(tName, colTps, colDescripts);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(123)));
+    std::shared_ptr<DbType> value{new DbInt32(123)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("", to_add);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(321)));
+    std::shared_ptr<DbType> value{new DbInt32(321)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("table1", to_add);
 }
@@ -120,13 +114,11 @@ TEST(CheckCreateColumnSame, 4) {
     std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
     db.CreateTable(tName, colTps, colDescripts);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(123)));
+    std::shared_ptr<DbType> value{new DbInt32(123)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     db.Insert("col_same", to_add);
 
-    std::shared_ptr<DbType> value;
-    value.reset(dynamic_cast<DbType*>(new DbInt32(321)));
+    std::shared_ptr<DbType> value{new DbInt32(321)};
     std::vector<Table::Value> to_add = {Table::Value(value)};
     EXPECT_ANY_THROW(db.Insert("col_same", to_add));
 }

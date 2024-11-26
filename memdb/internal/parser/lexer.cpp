@@ -257,15 +257,13 @@ struct Token {
 
 template<typename T>
 static std::shared_ptr<Token> getSharedToken() {
-    std::shared_ptr<Token> res;
-    res.reset(new T{});
+    std::shared_ptr<Token> res{new T{}};
     return res;
 }
 
 template<typename T>
 static std::shared_ptr<Token> getSharedToken(T* val) {
-    std::shared_ptr<Token> res;
-    res.reset(val);
+    std::shared_ptr<Token> res{val};
     return res;
 }
 
@@ -284,9 +282,8 @@ struct CommandT : public Token {
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new CommandT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new CommandT(t)};
         return copy;
     }
 
@@ -308,9 +305,8 @@ struct SubCommandT : public Token {
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new SubCommandT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new SubCommandT(t)};
         return copy;
     }
 
@@ -332,9 +328,8 @@ struct AttributeT : public Token {
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new AttributeT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new AttributeT(t)};
         return copy;
     }
 
@@ -356,9 +351,8 @@ struct OtherT : public Token {
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new OtherT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new OtherT(t)};
         return copy;
     }
 
@@ -381,9 +375,8 @@ struct OperationT : public Token {
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new OperationT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new OperationT(t)};
         return copy;
     }
 
@@ -405,9 +398,8 @@ struct BracketT : public Token {
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new BracketT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new BracketT(t)};
         return copy;
     }
 
@@ -433,8 +425,7 @@ struct ColumnTypeT : public Token {
     }
 
     std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new ColumnTypeT(t)));
+        std::shared_ptr<Token> copy{new ColumnTypeT(t)};
         return copy;
     }
 
@@ -451,7 +442,8 @@ struct DBTypeT : public Token {
         {
             auto res = lexer::IsString(inp, ind);
             if (res.first) {
-                t.reset(dynamic_cast<DbType*>(new DbString(res.second)));
+                std::shared_ptr<DbType> tmp{new DbString(res.second)};
+                t.swap(tmp);
                 ind++;
                 return true;
             }
@@ -459,7 +451,8 @@ struct DBTypeT : public Token {
         {
             auto res = lexer::IsBytes(inp, ind);
             if (res.first) {
-                t.reset(dynamic_cast<DbType*>(new DbBytes(res.second)));
+                std::shared_ptr<DbType> tmp{new DbBytes(res.second)};
+                t.swap(tmp);
                 ind++;
                 return true;
             }
@@ -467,7 +460,8 @@ struct DBTypeT : public Token {
         {
             auto res = lexer::IsInt(inp, ind);
             if (res.first) {
-                t.reset(dynamic_cast<DbType*>(new DbInt32(res.second)));
+                std::shared_ptr<DbType> tmp{new DbInt32(res.second)};
+                t.swap(tmp);
                 ind++;
                 return true;
             }
@@ -475,7 +469,8 @@ struct DBTypeT : public Token {
         {
             auto res = lexer::IsBool(inp, ind);
             if (res.first) {
-                t.reset(dynamic_cast<DbType*>(new DbBool(res.second)));
+                std::shared_ptr<DbType> tmp{new DbBool(res.second)};
+                t.swap(tmp);
                 ind++;
                 return true;
             }
@@ -483,9 +478,8 @@ struct DBTypeT : public Token {
         return false;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new DBTypeT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new DBTypeT(t)};
         return copy;
     }
 
@@ -504,9 +498,8 @@ struct StringT : public Token {
         return true;
     }
 
-    std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new StringT(t)));
+    std::shared_ptr<Token> Copy() override {
+        std::shared_ptr<Token> copy{new StringT(t)};
         return copy;
     }
 

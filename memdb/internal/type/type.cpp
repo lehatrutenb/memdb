@@ -80,8 +80,7 @@ public:
     }
 
     std::shared_ptr<DbType> Copy() {
-        std::shared_ptr<DbType> copy;
-        copy.reset(dynamic_cast<DbType*>(new DbInt32(x)));
+        std::shared_ptr<DbType> copy{new DbInt32(x)};
         return copy;
     }
 
@@ -139,8 +138,7 @@ public:
     }
 
     std::shared_ptr<DbType> Copy() {
-        std::shared_ptr<DbType> copy;
-        copy.reset(dynamic_cast<DbType*>(new DbBool(x)));
+        std::shared_ptr<DbType> copy{new DbBool(x)};
         return copy;
     }
 
@@ -164,8 +162,7 @@ public:
     }
 
     std::shared_ptr<DbType> Copy() {
-        std::shared_ptr<DbType> copy;
-        copy.reset(dynamic_cast<DbType*>(new DbBytes(v)));
+        std::shared_ptr<DbType> copy{new DbBytes(v)};
         return copy;
     }
 
@@ -189,8 +186,7 @@ public:
     }
 
     std::shared_ptr<DbType> Copy() {
-        std::shared_ptr<DbType> copy;
-        copy.reset(dynamic_cast<DbType*>(new DbString(s)));
+        std::shared_ptr<DbType> copy{new DbString(s)};
         return copy;
     }
 

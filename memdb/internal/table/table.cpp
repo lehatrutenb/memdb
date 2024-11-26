@@ -21,17 +21,24 @@ public:
             exit(-1); // throw exc
         }
         std::shared_ptr<Column> newCol;
-        switch (colTp.t) {
+        if (colTp.t == Type::Int32) {
+            std::shared_ptr<Column> tm{new ColumnInt32(descr)};
+            newCol.swap(tm);
+        } else {
+            exit(-1); // throw exc
+        }
+        /*switch (colTp.t) {
         case Type::Int32:
-            newCol.reset(new ColumnInt32(descr));
+            std::shared_ptr<Column> tm{new ColumnInt32(descr)};
+            newCol.swap(tm);
             break;
         /*case Type::Bool:
             newCol = std::make_shared<Column>(ColumnBool(tps, name, defVal));
-            break;*/
+            break;* /
         default:
             exit(-1); // throw exc
             break;
-        }
+        }*/
         name2Ind[descr.name] = columns.size();
         columns.emplace_back(newCol);
     }

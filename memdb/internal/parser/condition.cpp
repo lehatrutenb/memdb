@@ -36,8 +36,7 @@ struct Condition {
 
     Condition() {
         isLeaf = true;
-        std::shared_ptr<DbType> tr;
-        tr.reset(dynamic_cast<DbType*>(new DbBool(true)));
+        std::shared_ptr<DbType> tr{new DbBool(true)};
         leaf = std::make_shared<ConditionLeaf>(ConditionLeaf(tr));
     }
     Condition(std::shared_ptr<ConditionLeaf> leaf_) : isLeaf(true), leaf(leaf_) {}
@@ -94,8 +93,7 @@ struct Condition {
 
         if (IsCmpOp(Op)) {
             if (leftCond && rightCond) {
-                std::shared_ptr<DbType> resObj;
-                resObj.reset(dynamic_cast<DbType*>(new DbBool(DoOp(Op, leftCond->Compute(), rightCond->Compute()))));
+                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(), rightCond->Compute()))};
                 return resObj;
             } else {
                 // throw ex - 2 operands op
@@ -105,9 +103,8 @@ struct Condition {
 
         if (Op == Operation::LEN) {
             if (rightCond) {
-                std::shared_ptr<DbType> resObj;
                 auto rightRes = rightCond->Compute();
-                resObj.reset(dynamic_cast<DbType*>(new DbInt32(DoOp(Op, rightRes, rightRes))));
+                std::shared_ptr<DbType> resObj{new DbInt32(DoOp(Op, rightRes, rightRes))};
                 return resObj;
             } else {
                 // throw ex - 1 operand op
@@ -117,17 +114,15 @@ struct Condition {
 
         if (IsBoolOp(Op)) {
             if (Op == Operation::NOT) {
-                std::shared_ptr<DbType> resObj;
                 auto rightRes = rightCond->Compute();
-                resObj.reset(dynamic_cast<DbType*>(new DbBool(DoOp(Op, rightRes, rightRes))));
+                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, rightRes, rightRes))};
                 return resObj;
             } else {
                 if (!leftCond || !rightCond) {
                     // throw ex - 2 op op
                     exit(-1);
                 }
-                std::shared_ptr<DbType> resObj;
-                resObj.reset(dynamic_cast<DbType*>(new DbBool(DoOp(Op, leftCond->Compute(), rightCond->Compute()))));
+                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(), rightCond->Compute()))};
                 return resObj;
             }
         }
@@ -227,8 +222,7 @@ struct ConditionT : public Tokenizer::Token {
     }
 
     std::shared_ptr<Token> Copy() {
-        std::shared_ptr<Token> copy;
-        copy.reset(dynamic_cast<Token*>(new ConditionT(t)));
+        std::shared_ptr<Token> copy{new ConditionT(t)};
         return copy;
     }
 

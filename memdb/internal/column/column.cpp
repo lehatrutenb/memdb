@@ -28,7 +28,8 @@ struct ColumnDescription  {
     std::shared_ptr<DbType> defVal;
 
     ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string_view name_): tps(tps_), name(name_) {
-        defVal.reset(dynamic_cast<DbType*>(new DbTypeEmpty{}));
+        std::shared_ptr<DbType> tmp{new DbTypeEmpty{}};
+        defVal.swap(tmp);
     }
     ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string_view name_, const std::shared_ptr<DbType> defVal_): tps(tps_), name(name_), defVal(defVal_) {}
 };
