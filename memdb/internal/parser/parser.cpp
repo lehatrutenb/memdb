@@ -5,7 +5,8 @@
 #include <memory>
 #include "../type/type.cpp"
 #include "lexer.cpp"
-#include "objects.cpp"
+#include "condition.cpp"
+#include "createColumns.cpp"
 
 //#include "objects.cpp"
 /*
@@ -97,7 +98,8 @@ public:
             exit(-1);
         }
 
-        auto res = parser::ConditionParser{}.Parse(tokens, 1, tokens.size() - 1);
+        //auto res = parser::ConditionParser{}.Parse(tokens, 1, tokens.size() - 1);
+        auto res = parser::ColumnParser{}.Parse(tokens, 0, tokens.size() - 1);
         int gg;
     }
 };
@@ -108,4 +110,7 @@ int main() {
     //std::string_view req = "where is_admin || id < 10";
     //std::string_view req = "where is_admin && x^^y = 0 || |\"abc\"|!=2 || id < 10";
     //memdb::Parser{}.Parse(req, 0, req.size() - 1);
+
+    std::string_view req = "({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
+    memdb::Parser{}.Parse(req, 0, req.size() - 1);
 }

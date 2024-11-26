@@ -33,6 +33,10 @@ struct ColumnDescription  {
     ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string_view name_, const std::shared_ptr<DbType> defVal_): tps(tps_), name(name_), defVal(defVal_) {}
 };
 
+struct ColumnFullDescription : public ColumnType, public ColumnDescription {
+    ColumnFullDescription(ColumnType ct, ColumnDescription cd): ColumnType(ct), ColumnDescription(cd){};
+};
+
 class Column {
 public:
     Column(std::vector<ColumnAttrs> tps, std::string_view name_) : name(name_) {

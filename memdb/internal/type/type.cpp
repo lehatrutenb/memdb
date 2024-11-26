@@ -66,6 +66,7 @@ class DbTypeEmpty : public DbType {
     Type getType() {
         return Type::Empty;
     }
+    std::shared_ptr<DbType> Copy(){};
 };
 
 class DbInt32 : public DbType {

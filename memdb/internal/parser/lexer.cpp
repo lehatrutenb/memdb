@@ -6,6 +6,7 @@
 #include <memory>
 #include <cctype>
 #include "../type/type.cpp"
+#include "../column/column.cpp"
 
 namespace memdb {
 
@@ -28,9 +29,9 @@ namespace lexer {
     };
 
     enum class Attribute {
-        UNIQUE,
-        AUTOINCREMENT,
-        KEY,
+        UNIQUE = 1,
+        AUTOINCREMENT = 2,
+        KEY = 4,
         ORDERED,
         UNORDERED
     };
@@ -44,15 +45,19 @@ namespace lexer {
         LENC,
         RECTO,
         RECTC,
-        TWOPOINT
     };
 
-    enum class ColumnType {
+    enum class Other {
+        TWOPOINT,
+        COMMA
+    };
+
+   /*enum class ColumnType {
         INT32,
         BOOL,
         BYTES,
         STRING
-    };
+    };*/
 
     std::map<std::string_view, Command> s2c = {
         {"create", Command::CREATE}, {"insert", Command::INSERT}, {"select", Command::SELECT}, {"update", Command::UPDATE}, {"delete", Command::DELETE}, 
@@ -76,11 +81,15 @@ namespace lexer {
     };
 
     std::map<std::string_view, Bracket> s2br = {
-        {"(", Bracket::CIRCLEO}, {")", Bracket::CIRCLEC}, {"|{", Bracket::LENO}, {"}|", Bracket::LENC}, {"{", Bracket::FIGUREO}, {"}", Bracket::FIGUREC}, {"[]", Bracket::RECTO}, {"]", Bracket::RECTC}, {":", Bracket::TWOPOINT}, 
+        {"(", Bracket::CIRCLEO}, {")", Bracket::CIRCLEC}, {"|{", Bracket::LENO}, {"}|", Bracket::LENC}, {"{", Bracket::FIGUREO}, {"}", Bracket::FIGUREC}, {"[", Bracket::RECTO}, {"]", Bracket::RECTC}, 
     };
 
-    std::map<std::string_view, ColumnType> s2ct = {
-        {"int32", ColumnType::INT32}, {"bool", ColumnType::BOOL}, {"string", ColumnType::STRING}, {"bytes", ColumnType::BYTES}, 
+    std::map<std::string_view, Type> s2ct = {
+        {"int32", Type::Int32}, {"bool", Type::Bool}, {"string", Type::String}, {"bytes", Type::Bytes}, 
+    };
+
+    std::map<std::string_view, Other> s2oth = {
+        {":", Other::TWOPOINT}, {",", Other::COMMA},
     };
 
     std::string AddSpace(const std::string_view& s, int& ind, bool& insideString, bool& insideLen) { // care - change index itself
@@ -153,6 +162,13 @@ namespace lexer {
         return {true, s2op[inp[ind]]};
     }
 
+    std::pair<bool, Other> IsOther(std::vector<std::string>& inp, int ind) {
+        if (s2oth.find(inp[ind]) == s2oth.end()) {
+            return {false, Other{}};
+        }
+        return {true, s2oth[inp[ind]]};
+    }
+
     std::pair<bool, Bracket> IsBracket(std::vector<std::string>& inp, int ind) {
         if (ind + 1 < inp.size() && s2br.find(inp[ind] + inp[ind + 1]) != s2br.end()) {
              return {true, s2br[inp[ind] + inp[ind + 1]]};
@@ -172,15 +188,18 @@ namespace lexer {
 
     std::pair<bool, ColumnType> IsColumnType(std::vector<std::string>& inp, int ind) {
         if (s2ct.find(inp[ind]) == s2ct.end()) {
-            return {false, ColumnType{}};
+            return {false, ColumnType{Type::Empty}};
         }
-        if (s2ct[inp[ind]] == ColumnType::STRING || s2ct[inp[ind]] == ColumnType::BYTES) {
-            if (ind + 3 < inp.size() && IsBracket(inp, ind + 1).second == Bracket::RECTO && IsBracket(inp, ind + 3).second == Bracket::RECTC && IsInt(inp, ind + 2).first == true) {
-                return {true, s2ct[inp[ind]]};
+        if (s2ct[inp[ind]] == Type::String || s2ct[inp[ind]] == Type::Bytes) {
+            if (ind + 3 < inp.size()) {
+                auto sz = IsInt(inp, ind + 2);
+                if (IsBracket(inp, ind + 1).second == Bracket::RECTO && IsBracket(inp, ind + 3).second == Bracket::RECTC && sz.first == true) {
+                    return {true, ColumnType(s2ct[inp[ind]], sz.second)};
+                }
             }
-            return {false, ColumnType{}};
+            return {false, ColumnType{Type::Empty}};
         }
-        return {true, s2ct[inp[ind]]};
+        return {true, ColumnType(s2ct[inp[ind]])};
     }
 
     std::pair<bool, std::string> IsString(std::vector<std::string>& inp, int ind) {
@@ -226,6 +245,7 @@ enum class TokenT {
     COLUMNTYPE,
     DBTYPE,
     STRING,
+    OTHER,
     CONDITION
 };
 
@@ -321,6 +341,30 @@ struct AttributeT : public Token {
     lexer::Attribute t;
 };
 
+struct OtherT : public Token {
+    OtherT(){};
+    OtherT(lexer::Other t_) : t(t_){};
+    TokenT GetType() const override {
+        return TokenT::OTHER;
+    }
+    bool Parse(std::vector<std::string>& inp, int& ind) override {
+        auto res = lexer::IsOther(inp, ind);
+        if (res.first) {
+            t = res.second;
+            ind++;
+        }
+        return res.first;
+    }
+
+    std::shared_ptr<Token> Copy() {
+        std::shared_ptr<Token> copy;
+        copy.reset(dynamic_cast<Token*>(new OtherT(t)));
+        return copy;
+    }
+
+    lexer::Other t;
+};
+
 
 struct OperationT : public Token {
     OperationT(){};
@@ -371,8 +415,8 @@ struct BracketT : public Token {
 };
 
 struct ColumnTypeT : public Token {
-    ColumnTypeT(){};
-    ColumnTypeT(lexer::ColumnType t_) : t(t_){};
+    ColumnTypeT() : t(ColumnType{Type::Empty}){};
+    ColumnTypeT(ColumnType t_) : t(t_){};
     TokenT GetType() const override {
         return TokenT::COLUMNTYPE;
     }
@@ -381,20 +425,20 @@ struct ColumnTypeT : public Token {
         if (res.first) {
             t = res.second;
             ind++;
-            if (t == lexer::ColumnType::STRING || t == lexer::ColumnType::BYTES) {
+            if (t.t == Type::String || t.t == Type::Bytes) {
                 ind+=3;
             }
         }
         return res.first;
     }
 
-    std::shared_ptr<Token> Copy() {
+    std::shared_ptr<Token> Copy() override {
         std::shared_ptr<Token> copy;
         copy.reset(dynamic_cast<Token*>(new ColumnTypeT(t)));
         return copy;
     }
 
-    lexer::ColumnType t;
+    ColumnType t;
 };
 
 struct DBTypeT : public Token {
@@ -470,7 +514,7 @@ struct StringT : public Token {
 };
 
 std::vector<std::shared_ptr<Token>> tokenSeq = {getSharedToken<CommandT>(), getSharedToken<SubCommandT>(), getSharedToken<AttributeT>(),
-            getSharedToken<OperationT>(), getSharedToken<BracketT>(), getSharedToken<ColumnTypeT>(), getSharedToken<DBTypeT>(), getSharedToken<StringT>()};
+            getSharedToken<OperationT>(), getSharedToken<BracketT>(), getSharedToken<ColumnTypeT>(), getSharedToken<DBTypeT>(), getSharedToken<OtherT>(), getSharedToken<StringT>()};
 
 std::vector<std::shared_ptr<Token>> Tokenize(std::vector<std::string> inp, int ind) {
     std::vector<std::shared_ptr<Token>> tokens;
@@ -486,6 +530,13 @@ std::vector<std::shared_ptr<Token>> Tokenize(std::vector<std::string> inp, int i
 }
 
 };
+
+namespace parser {
+template<typename T, typename U>
+U getValue(std::shared_ptr<Tokenizer::Token> token) {
+    return dynamic_cast<T*>(token.get())->t;
+}
+}
 
 std::pair<std::string, std::string> ParseTableColumn(const std::string& s) {
     ssize_t dotInd= 0;
