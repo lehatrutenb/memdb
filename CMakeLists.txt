@@ -14,7 +14,7 @@ endif()
 #set(PATH_TO_PROGRAM "/Users/lehatrutenb/Desktop/hse/1_course/C++/Emulator/Emulator/Emulator/Runner/Factorial")
 #configure_file(${PROJECT_SOURCE_DIR}/Runner/include/runner.hpp.in ${PROJECT_SOURCE_DIR}/Runner/include/runner.hpp)
 
-#add_executable(Memdb Runner/src/main.cpp)
+add_executable(Memdb memdb/internal/dataBase/db.cpp)
 
 include(FetchContent)
 FetchContent_Declare(

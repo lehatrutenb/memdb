@@ -25,7 +25,8 @@ namespace lexer {
         ON,
         SET,
         FROM,
-        INDEX
+        INDEX,
+        TABLE
     };
 
     enum class Attribute {
@@ -65,7 +66,7 @@ namespace lexer {
     };
 
     std::map<std::string_view, SubCommand> s2sc = {
-        {"where", SubCommand::WHERE}, {"on", SubCommand::ON}, {"set", SubCommand::SET}, {"from", SubCommand::FROM}, {"index", SubCommand::INDEX}
+        {"where", SubCommand::WHERE}, {"on", SubCommand::ON}, {"set", SubCommand::SET}, {"from", SubCommand::FROM}, {"index", SubCommand::INDEX}, {"table", SubCommand::TABLE}
     };
 
     std::map<std::string_view, Attribute> s2a = {
@@ -210,13 +211,13 @@ namespace lexer {
     }
 
     std::pair<bool, std::vector<char>> IsBytes(std::vector<std::string>& inp, int ind) {
-        if (inp[ind].size() >= 3 && inp[ind][0] == '0' && inp[ind][1] == 'x') {
+        if (inp[ind].size() >= 2 && inp[ind][0] == '0' && inp[ind][1] == 'x') {
             std::vector<char> v(inp[ind].size());
             v[0] = inp[ind][0];
             v[1] = inp[ind][1];
             for (int i = 2; i < inp[ind].size(); i++) {
                 v[i] = inp[ind][i];
-                if ('0' <= inp[ind][i] && inp[ind][i] <= '9') { // no isdigit here!
+                if (('0' <= inp[ind][i] && inp[ind][i] <= '9')||('a' <= inp[ind][i] && inp[ind][i] <= 'f')) { // no isdigit here!
                     continue;
                 }
                 return {false, {}};

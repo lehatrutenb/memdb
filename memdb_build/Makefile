@@ -172,6 +172,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named Memdb
+
+# Build rule for target.
+Memdb: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Memdb
+.PHONY : Memdb
+
+# fast build rule for target.
+Memdb/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Memdb.dir/build.make CMakeFiles/Memdb.dir/build
+.PHONY : Memdb/fast
+
+#=============================================================================
 # Target rules for targets named gmock
 
 # Build rule for target.
@@ -236,18 +249,29 @@ Memdb_db/fast:
 	$(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build
 .PHONY : Memdb_db/fast
 
-#=============================================================================
-# Target rules for targets named Memdb_dbTest
+memdb/internal/dataBase/db.o: memdb/internal/dataBase/db.cpp.o
+.PHONY : memdb/internal/dataBase/db.o
 
-# Build rule for target.
-Memdb_dbTest: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Memdb_dbTest
-.PHONY : Memdb_dbTest
+# target to build an object file
+memdb/internal/dataBase/db.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Memdb.dir/build.make CMakeFiles/Memdb.dir/memdb/internal/dataBase/db.cpp.o
+.PHONY : memdb/internal/dataBase/db.cpp.o
 
-# fast build rule for target.
-Memdb_dbTest/fast:
-	$(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build
-.PHONY : Memdb_dbTest/fast
+memdb/internal/dataBase/db.i: memdb/internal/dataBase/db.cpp.i
+.PHONY : memdb/internal/dataBase/db.i
+
+# target to preprocess a source file
+memdb/internal/dataBase/db.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Memdb.dir/build.make CMakeFiles/Memdb.dir/memdb/internal/dataBase/db.cpp.i
+.PHONY : memdb/internal/dataBase/db.cpp.i
+
+memdb/internal/dataBase/db.s: memdb/internal/dataBase/db.cpp.s
+.PHONY : memdb/internal/dataBase/db.s
+
+# target to generate assembly for a file
+memdb/internal/dataBase/db.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Memdb.dir/build.make CMakeFiles/Memdb.dir/memdb/internal/dataBase/db.cpp.s
+.PHONY : memdb/internal/dataBase/db.cpp.s
 
 # Help Target
 help:
@@ -262,12 +286,15 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... Memdb"
 	@echo "... Memdb_db"
-	@echo "... Memdb_dbTest"
 	@echo "... gmock"
 	@echo "... gmock_main"
 	@echo "... gtest"
 	@echo "... gtest_main"
+	@echo "... memdb/internal/dataBase/db.o"
+	@echo "... memdb/internal/dataBase/db.i"
+	@echo "... memdb/internal/dataBase/db.s"
 .PHONY : help
 
 

@@ -24,14 +24,14 @@ enum class ColumnAttrs {
 
 struct ColumnDescription  {
     const std::vector<ColumnAttrs> tps;
-    const std::string_view name;
+    const std::string name;
     std::shared_ptr<DbType> defVal;
 
-    ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string_view name_): tps(tps_), name(name_) {
+    ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string name_): tps(tps_), name(name_) {
         std::shared_ptr<DbType> tmp{new DbTypeEmpty{}};
         defVal.swap(tmp);
     }
-    ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string_view name_, const std::shared_ptr<DbType> defVal_): tps(tps_), name(name_), defVal(defVal_) {}
+    ColumnDescription(const std::vector<ColumnAttrs> tps_, const std::string name_, const std::shared_ptr<DbType> defVal_): tps(tps_), name(name_), defVal(defVal_) {}
 };
 
 struct ColumnFullDescription : public ColumnType, public ColumnDescription {
@@ -78,6 +78,147 @@ public:
     using DbT = DbInt32;
 
     ColumnInt32(ColumnDescription descr) : Column(descr.tps, descr.name) {
+        if (descr.defVal.get()->getType() == Type::Empty) {
+            defVal = {};
+        } else {
+            defVal = std::optional<T>{dynamic_cast<DbT*>(descr.defVal.get())->get()};
+        }
+        curMassOp = dynamic_cast<DbTypeMassoP<T>*>(&cur);
+    }
+    
+    ssize_t push(std::shared_ptr<DbType> x) {
+        T x_ = dynamic_cast<DbT*>(x.get())->get();
+        return cur.push(x_);
+    }
+
+    ssize_t push() {
+        if (defVal.has_value()) {
+            return cur.push(defVal.value());
+        }
+        // throw ex
+        return -1;
+    }
+
+    void del(ssize_t ind) {
+        cur.del(ind);
+    }
+
+    void update(ssize_t ind, std::shared_ptr<DbType> x) { // std::shared_ptr<DbType>
+        T x_ = dynamic_cast<DbT*>(x.get())->get();
+        cur.update(ind, x_);
+    }
+
+    T get(ssize_t ind) {
+        return cur.get(ind);
+    }
+
+    DbTypeMassoP<T>* curMassOp; // это же ок? // да, не обяз разименования, но это и так тяжёлые операции - их много не сделать
+private:
+    DbType_s<T> cur = DbType_s<T>{};
+    std::optional<T> defVal;
+};
+
+
+
+class ColumnBool : public Column {
+public:
+    using T = bool;
+    using DbT = DbBool;
+
+    ColumnBool(ColumnDescription descr) : Column(descr.tps, descr.name) {
+        if (descr.defVal.get()->getType() == Type::Empty) {
+            defVal = {};
+        } else {
+            defVal = std::optional<T>{dynamic_cast<DbT*>(descr.defVal.get())->get()};
+        }
+        curMassOp = dynamic_cast<DbTypeMassoP<T>*>(&cur);
+    }
+    
+    ssize_t push(std::shared_ptr<DbType> x) {
+        T x_ = dynamic_cast<DbT*>(x.get())->get();
+        return cur.push(x_);
+    }
+
+    ssize_t push() {
+        if (defVal.has_value()) {
+            return cur.push(defVal.value());
+        }
+        // throw ex
+        return -1;
+    }
+
+    void del(ssize_t ind) {
+        cur.del(ind);
+    }
+
+    void update(ssize_t ind, std::shared_ptr<DbType> x) { // std::shared_ptr<DbType>
+        T x_ = dynamic_cast<DbT*>(x.get())->get();
+        cur.update(ind, x_);
+    }
+
+    T get(ssize_t ind) {
+        return cur.get(ind);
+    }
+
+    DbTypeMassoP<T>* curMassOp; // это же ок? // да, не обяз разименования, но это и так тяжёлые операции - их много не сделать
+private:
+    DbType_s<T> cur = DbType_s<T>{};
+    std::optional<T> defVal;
+};
+
+class ColumnString : public Column {
+public:
+    using T = std::string;
+    using DbT = DbString;
+
+    ColumnString(ColumnDescription descr) : Column(descr.tps, descr.name) {
+        if (descr.defVal.get()->getType() == Type::Empty) {
+            defVal = {};
+        } else {
+            defVal = std::optional<T>{dynamic_cast<DbT*>(descr.defVal.get())->get()};
+        }
+        curMassOp = dynamic_cast<DbTypeMassoP<T>*>(&cur);
+    }
+    
+    ssize_t push(std::shared_ptr<DbType> x) {
+        T x_ = dynamic_cast<DbT*>(x.get())->get();
+        return cur.push(x_);
+    }
+
+    ssize_t push() {
+        if (defVal.has_value()) {
+            return cur.push(defVal.value());
+        }
+        // throw ex
+        return -1;
+    }
+
+    void del(ssize_t ind) {
+        cur.del(ind);
+    }
+
+    void update(ssize_t ind, std::shared_ptr<DbType> x) { // std::shared_ptr<DbType>
+        T x_ = dynamic_cast<DbT*>(x.get())->get();
+        cur.update(ind, x_);
+    }
+
+    T get(ssize_t ind) {
+        return cur.get(ind);
+    }
+
+    DbTypeMassoP<T>* curMassOp; // это же ок? // да, не обяз разименования, но это и так тяжёлые операции - их много не сделать
+private:
+    DbType_s<T> cur = DbType_s<T>{};
+    std::optional<T> defVal;
+};
+
+
+class ColumnBytes : public Column {
+public:
+    using T = std::vector<char>;
+    using DbT = DbBytes;
+
+    ColumnBytes(ColumnDescription descr) : Column(descr.tps, descr.name) {
         if (descr.defVal.get()->getType() == Type::Empty) {
             defVal = {};
         } else {

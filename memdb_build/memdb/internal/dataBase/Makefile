@@ -185,20 +185,6 @@ Memdb_db/fast:
 	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build
 .PHONY : Memdb_db/fast
 
-# Convenience name for target.
-memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
-.PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
-
-# Convenience name for target.
-Memdb_dbTest: memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
-.PHONY : Memdb_dbTest
-
-# fast build rule for target.
-Memdb_dbTest/fast:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build
-.PHONY : Memdb_dbTest/fast
-
 db.o: db.cpp.o
 .PHONY : db.o
 
@@ -223,30 +209,6 @@ db.cpp.s:
 	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.s
 .PHONY : db.cpp.s
 
-test.o: test.cpp.o
-.PHONY : test.o
-
-# target to build an object file
-test.cpp.o:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.o
-.PHONY : test.cpp.o
-
-test.i: test.cpp.i
-.PHONY : test.i
-
-# target to preprocess a source file
-test.cpp.i:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.i
-.PHONY : test.cpp.i
-
-test.s: test.cpp.s
-.PHONY : test.s
-
-# target to generate assembly for a file
-test.cpp.s:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.s
-.PHONY : test.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -261,13 +223,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... Memdb_db"
-	@echo "... Memdb_dbTest"
 	@echo "... db.o"
 	@echo "... db.i"
 	@echo "... db.s"
-	@echo "... test.o"
-	@echo "... test.i"
-	@echo "... test.s"
 .PHONY : help
 
 

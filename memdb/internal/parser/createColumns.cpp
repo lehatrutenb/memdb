@@ -48,7 +48,7 @@ struct ColumnParser {
         r--;
 
         while (l < r) {
-            res.info.emplace_back(parseOne(inp, l, r));
+            res.info.push_back(parseOne(inp, l, r));
         }
         return res;
     }

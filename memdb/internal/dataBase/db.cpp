@@ -1,6 +1,7 @@
 #pragma once
 #include <string_view>
 #include "../table/table.cpp"
+#include "../parser/parser.cpp"
 
 /*
 доп ограничения:
@@ -15,6 +16,7 @@
 что можно легко добавить:
 1. разрешить использовать оба типа при insert одновременно
 */
+
 namespace memdb {
 class Database {
 public:
@@ -40,7 +42,20 @@ public:
     }
 
     void Execute(const std::string_view& request) { // not void
+        auto res1 = Parser{}.ParseCreate(request, 0, request.size() - 1);
+        auto res2 = Parser{}.ParseInsert(request, 0, request.size() - 1);
 
+        if (res1.first) {
+            std::vector<ColumnType> v1;
+            std::vector<ColumnDescription> v2;
+            for (auto el : res1.second.second.info) {
+                v1.push_back(el.t);
+                v2.push_back(static_cast<ColumnDescription>(el));
+            }
+            CreateTable(res1.second.first, v1, v2);
+        } else {
+            Insert(res2.second.first, res2.second.second.data);
+        }
     }
 
 private:
@@ -79,7 +94,13 @@ using namespace memdb;
 
 int main() {
     Database db;
-    const std::string_view tName = "table1";
+    std::string_view req1 = "create table users ({key, autoincrement} id : int32 = 5)";
+    std::string_view req2 = "insert (,) to users";
+
+    db.Execute(req1);
+    db.Execute(req2);
+    int x;
+    /*const std::string_view tName = "table1";
     std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
     std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
     db.CreateTable(tName, colTps, colDescripts);
@@ -95,5 +116,5 @@ int main() {
 
     std::shared_ptr<DbType> value2{new DbInt32(321)};
     std::vector<Table::Value> to_add2 = {Table::Value(value2)};
-    db.Insert("table2", to_add);
+    db.Insert("table2", to_add);*/
 }

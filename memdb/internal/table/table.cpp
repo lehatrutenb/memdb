@@ -1,3 +1,4 @@
+#pragma once
 #include "../row/row.cpp"
 #include "../type/type.cpp"
 #include "../column/column.cpp"
@@ -10,8 +11,8 @@ class Table {
 public:
     struct Value {
         Value(const std::shared_ptr<DbType>& fValue_) : fValue(fValue_) {};
-        Value(const std::string_view& fName_, const std::shared_ptr<DbType>& fValue_) : fName(fName_), fValue(fValue_) {};
-        const std::string_view fName;
+        Value(const std::string& fName_, const std::shared_ptr<DbType>& fValue_) : fName(fName_), fValue(fValue_) {};
+        const std::string fName;
         const std::shared_ptr<DbType> fValue;
     };
 
@@ -24,8 +25,15 @@ public:
         if (colTp.t == Type::Int32) {
             std::shared_ptr<Column> tm{new ColumnInt32(descr)};
             newCol.swap(tm);
-        } else {
-            exit(-1); // throw exc
+        } else if (colTp.t == Type::Bool) {
+            std::shared_ptr<Column> tm{new ColumnBool(descr)};
+            newCol.swap(tm);
+        } else if (colTp.t == Type::String) {
+            std::shared_ptr<Column> tm{new ColumnString(descr)};
+            newCol.swap(tm);
+        } else if (colTp.t == Type::Bytes) {
+            std::shared_ptr<Column> tm{new ColumnBytes(descr)};
+            newCol.swap(tm);
         }
         /*switch (colTp.t) {
         case Type::Int32:
