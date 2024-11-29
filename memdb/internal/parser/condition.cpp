@@ -78,6 +78,7 @@ struct Condition {
         }
         if (vals.find(TableColumn(leaf->table, leaf->column)) == vals.end()) { // TODO check if correct to use leaf->table
             // throw ex - not found val at compute moment
+            throw std::runtime_error("error");
             exit(-1);
         }
         return vals[TableColumn(leaf->table, leaf->column)];
@@ -100,6 +101,7 @@ struct Condition {
                 return leftRes;
             } else {
                 // throw ex - 2 operands op
+                throw std::runtime_error("error");
                 exit(-1);
             }
         }
@@ -110,6 +112,7 @@ struct Condition {
                 return resObj;
             } else {
                 // throw ex - 2 operands op
+                throw std::runtime_error("error");
                 exit(-1);
             }
         }
@@ -121,6 +124,7 @@ struct Condition {
                 return resObj;
             } else {
                 // throw ex - 1 operand op
+                throw std::runtime_error("error");
                 exit(-1);
             }
         }
@@ -133,6 +137,7 @@ struct Condition {
             } else {
                 if (!leftCond || !rightCond) {
                     // throw ex - 2 op op
+                    throw std::runtime_error("error");
                     exit(-1);
                 }
                 std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(vals), rightCond->Compute(vals)))};
@@ -141,6 +146,7 @@ struct Condition {
         }
 
         // throw ex - unexp op
+        throw std::runtime_error("error");
         exit(-1);
 
         /*std::shared_ptr<DbType> resLeft, resRight;
@@ -194,6 +200,7 @@ struct Condition {
                 res.push_back(TableColumn(leaf->table, leaf->column)); // that is inside object to it is safe
             } else {
                 // throw ex - column must be set
+                throw std::runtime_error("error");
                 exit(-1);
             }
             return;
@@ -231,6 +238,7 @@ struct ConditionT : public Tokenizer::Token {
     }
     bool Parse(std::vector<std::string>& inp, int& ind) override {
         // throw ex - unexp call
+        throw std::runtime_error("error");
         exit(-1);
     }
 
@@ -246,6 +254,7 @@ struct ConditionParser {
     Condition Parse(const std::vector<std::shared_ptr<Tokenizer::Token>>& inp, ssize_t l, ssize_t r) {
         if (l > r) {
             // throw ex - expected to get not empty expression
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (l == r) {
@@ -260,6 +269,7 @@ struct ConditionParser {
             }
 
             // throw ex - token should be name.column or dbtype
+            throw std::runtime_error("error");
             exit(-1);
         }
 
@@ -282,6 +292,7 @@ struct ConditionParser {
                     }
                     if (left < l) {
                         // throw ex - not found opend bracet for close one
+                        throw std::runtime_error("error");
                         exit(-1);
                     }
                     Condition c = Parse(curTokens, left + 1, right); // cond inside brackets
@@ -315,6 +326,7 @@ struct ConditionParser {
                         if (Condition::hasPrior(curOp, pr)) {
                             if (i + 1 >= curTokens.size() || curTokensNxt.empty()) {
                                 // throw ex - not enough args per operation
+                                throw std::runtime_error("error");
                                 exit(-1);
                             }
                             curTokensNxt.emplace_back(curTokens[i + 1]);
@@ -340,6 +352,7 @@ struct ConditionParser {
         }
         if (curTokens.size() != 1) {
             // throw ex - invalid condtion
+            throw std::runtime_error("error");
             exit(-1);
         }
         return Parse(curTokens, 0, 0);

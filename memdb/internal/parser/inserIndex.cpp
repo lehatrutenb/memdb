@@ -40,6 +40,7 @@ struct InserValuesParser {
         InsertData res;
         if (!checkBracketed(inp, l, r, lexer::Bracket::CIRCLEO, lexer::Bracket::CIRCLEC)) {
             // throw ex - expected brackets
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (l + 1 == r) {
@@ -50,7 +51,7 @@ struct InserValuesParser {
         r--;
 
         bool skipComma = false;
-        while (l < r) {
+        while (l <= r) {
             switch(inp[l]->GetType()) {
                 case Tokenizer::TokenT::OTHER:
                     if (!skipComma) {
@@ -67,10 +68,12 @@ struct InserValuesParser {
                 case Tokenizer::TokenT::STRING:
                     if (l + 2 > r || inp[l + 1]->GetType() != Tokenizer::TokenT::OPERATION || inp[l + 2]->GetType() != Tokenizer::TokenT::DBTYPE) {
                         // throw ex incorrect data in column insert
+                        throw std::runtime_error("error");
                         exit(-1);
                     }
                     if (getValue<Tokenizer::OperationT, Operation>(inp[l + 1]) != Operation::EQ) {
                         // throw ex incorrect data in column insert - exp = between
+                        throw std::runtime_error("error");
                         exit(-1);
                     }
 
@@ -81,6 +84,7 @@ struct InserValuesParser {
                     break;
                 default:
                     //throw ex - unexp type in insert columt data
+                    throw std::runtime_error("error");
                     exit(-1);
             }
         }

@@ -38,6 +38,7 @@ struct ColumnParser {
         ColumnDescriptions res;
         if (!checkBracketed(inp, l, r, lexer::Bracket::CIRCLEO, lexer::Bracket::CIRCLEC)) {
             // throw ex - expected brackets
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (l + 1 == r) {
@@ -47,7 +48,7 @@ struct ColumnParser {
         l++;
         r--;
 
-        while (l < r) {
+        while (l <= r) {
             res.info.push_back(parseOne(inp, l, r));
         }
         return res;
@@ -56,6 +57,7 @@ struct ColumnParser {
     std::vector<ColumnAttrs> parseAttrs(const std::vector<std::shared_ptr<Tokenizer::Token>>& inp, ssize_t& l, ssize_t r) { // TODO change columnattrs to just value
         if (l > r) {
             // throw exp - failed to parse column attrs
+            throw std::runtime_error("error");
             exit(-1);
         }
         std::vector<ColumnAttrs> res;
@@ -77,10 +79,12 @@ struct ColumnParser {
                                 break;
                             default:
                                 // throw ex - unexp attr in column attrs;
+                                throw std::runtime_error("error");
                                 exit(-1);
                         }
                     } else {
                         // throw ex - not exp value in cloumn attributes
+                        throw std::runtime_error("error");
                         exit(-1);
                     }
                 }
@@ -98,19 +102,23 @@ struct ColumnParser {
         }
         if (l > r || l + 2 > r) {
             // throw exp - failed to parse column attrs
+            throw std::runtime_error("error");
             exit(-1);
         }
 
         if (inp[l]->GetType() != Tokenizer::TokenT::STRING) {
             // throw exp - expected name of column column attrs
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (inp[l + 1]->GetType() != Tokenizer::TokenT::OTHER || getValue<Tokenizer::OtherT, lexer::Other>(inp[l + 1]) != lexer::Other::TWOPOINT) {
             // throw exp - expected name of column column attrs
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (inp[l + 2]->GetType() != Tokenizer::TokenT::COLUMNTYPE) {
             // throw exp - expected name of column column attrs
+            throw std::runtime_error("error");
             exit(-1);
         }
         l += 3;
@@ -128,6 +136,7 @@ struct ColumnParser {
 
         if (inp[l + 1]->GetType() != Tokenizer::TokenT::DBTYPE) {
             // throw ex - def value not found
+            throw std::runtime_error("error");
         }
 
         l += 2;
@@ -140,6 +149,7 @@ struct ColumnParser {
         auto nameType = parseNameType(inp, l, r);
         if (!nameType.first) {
             // throw ex - invalid column init
+            throw std::runtime_error("error");
             exit(-1);
         }
 
@@ -151,6 +161,7 @@ struct ColumnParser {
 
         if (defVal.second->getType() != nameType.second.second.t) {
             // throw ex - default value type is incorrect
+            throw std::runtime_error("error");
             exit(-1);
         }
 

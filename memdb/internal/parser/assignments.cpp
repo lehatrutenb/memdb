@@ -43,9 +43,10 @@ public:
     Assignments Parse(const std::vector<std::shared_ptr<Tokenizer::Token>>& inp, ssize_t l, ssize_t r) {
         Assignments res;
 
-        while (l < r) {
+        while (l <= r) {
             if (inp[l]->GetType() != Tokenizer::TokenT::STRING) {
                 // throw ex expected column name in assignment
+                throw std::runtime_error("error");
                 exit(-1);
             }
 
@@ -53,6 +54,7 @@ public:
 
             if (inp[l + 1]->GetType() != Tokenizer::TokenT::OPERATION || getValue<Tokenizer::OperationT, Operation>(inp[l+1]) != Operation::EQ) {
                 // throw ex expected = operation in assignment
+                throw std::runtime_error("error");
                 exit(-1);
             }
 

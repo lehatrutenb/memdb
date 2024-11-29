@@ -3,6 +3,7 @@
 #include <map>
 #include "../table/table.cpp"
 #include "../parser/parser.cpp"
+#include <stdexcept>
 
 /*
 доп ограничения/ доп возможности:
@@ -20,6 +21,7 @@
 10. колонкам разрешено меняться в зависимости от других колонок этой же таблички и изм будут как 1 тразакция (a = "1" b = "2" a = a+b, b =b+a -> a=12 b = 21)
 что можно легко добавить:
 11. разрешено писать select col1 from table1 where ... вместо select table1.col1 from table1 where если табличка всего одна
+12. не очень понял почему в тестовых запросов опускали запятую в конце хотя в усл сказанно,что если не пишут поле, то хотя бы запятую оставляют - добавил
 1. разрешить использовать оба типа при insert одновременно
 */
 
@@ -28,11 +30,13 @@ class Database {
 public:
     Database()=default;
 
-    void CreateTable(const std::string_view& tName, const std::vector<ColumnFullDescription>& colDescripts) {
+    void CreateTable(const std::string& tName, const std::vector<ColumnFullDescription>& colDescripts) {
         // throw ex i f colDescripts and colTps not same size
         if (tName2ind.find(tName) != tName2ind.end()) {
             // throw ex - table names should be unique
+            throw std::runtime_error("error");
         }
+        tName2ind[tName] = tables.size();
         tables.emplace_back(Table{tName});
         //colTps.push_back({});
         //colTps.back().resize(colDescripts.size());
@@ -43,16 +47,18 @@ public:
         }
     }
 
-    void Insert(const std::string_view& tName, const std::vector<Table::Value>& values) {
+    void Insert(const std::string& tName, const std::vector<Table::Value>& values) {
         if (tName2ind.find(tName) == tName2ind.end()) {
             // throw ex
+            throw std::runtime_error("error");
         }
         tables[tName2ind[tName]].Insert(values);
     }
 
-    void Update(const std::string_view& tName, parser::Assignments& dataToUpdate, parser::Condition& condition) {
+    void Update(const std::string& tName, parser::Assignments& dataToUpdate, parser::Condition& condition) {
         if (tName2ind.find(tName) == tName2ind.end()) {
             // throw ex
+            throw std::runtime_error("error");
         }
         tables[tName2ind[tName]].Update(dataToUpdate, condition);
     }
@@ -66,6 +72,7 @@ public:
         }
         if (tName2ind.find(tcs[0].table) == tName2ind.end()) {
             // throw ex table not found
+            throw std::runtime_error("error");
             exit(-1);
         }
         return tables[tName2ind[tcs[0].table]].Select(tcs, condWh);
@@ -126,6 +133,7 @@ public:
             break;
         default:
             // throw ex unknown request
+            throw std::runtime_error("error");
             exit(-1);
         }
 
@@ -151,7 +159,7 @@ public:
 
 private:
     std::vector<Table> tables;
-    std::map<std::string_view, ssize_t> tName2ind;
+    std::map<std::string, ssize_t> tName2ind;
     //std::vector<std::vector<ColumnType>> colTps;
 };
 
@@ -190,12 +198,12 @@ insert (,"admin", 0x0000000000000000, true) to users
 int main() {
     Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
-    std::string_view req2 = "insert (,\"vasya\", 0xdeadbeefdeadbeef) to users";
-    std::string_view req3 = "insert (,\"vasya\", 0xdeadbeefdeadbeef) to users";
-    std::string_view req4 = "insert (,\"admin\", 0x0000000000000000, true) to users";
+    std::string_view req2 = R"(insert (,"vasya", 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req3 = R"(insert (login = "vasya", password_hash = 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req4 = R"(insert (,"admin", 0x0000000000000000, true) to users)";
 
     db.Execute(req1);
-    //db.Execute(req2);
+    db.Execute(req2);
     int x;
     /*const std::string_view tName = "table1";
     std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};

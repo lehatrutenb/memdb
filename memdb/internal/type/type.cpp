@@ -3,7 +3,9 @@
 #include <unordered_map>
 #include <functional>
 #include <forward_list>
+#include <string>
 #include <memory>
+#include <stdexcept>
 
 namespace memdb {
 
@@ -64,6 +66,7 @@ public:
 };
 
 class DbTypeEmpty : public DbType {
+    public:
     Type getType() override {
         return Type::Empty;
     }
@@ -100,6 +103,7 @@ public:
         case Operation::DIVIDE:
             if (another->x == 0) {
                 // throw ex divide by 0
+                throw std::runtime_error("error");
                 exit(-1);
             }
             x /= another->x;
@@ -107,6 +111,7 @@ public:
         case Operation::MOD:
         if (another->x == 0) {
                 // throw ex MOD 0
+                throw std::runtime_error("error");
                 exit(-1);
             }
             x %= another->x;
@@ -119,6 +124,7 @@ public:
             break;
         default:
             // throw ex - bad op
+            throw std::runtime_error("error");
             exit(-1);
             break;
         }
@@ -145,6 +151,7 @@ public:
 
     bool doOp(Operation op, const DbBool* another) { // update cur
         // throw err
+        throw std::runtime_error("error");
         exit(-1);
         return true;
     }
@@ -169,6 +176,7 @@ public:
 
     bool doOp(Operation op, const DbBytes* another) { // update cur
         // throw err
+        throw std::runtime_error("error");
         exit(-1);
         return true;
     }
@@ -193,6 +201,7 @@ public:
 
     bool doOp(Operation op, const DbString* another) { // update cur
         // throw err
+        throw std::runtime_error("error");
         exit(-1);
         return true;
     }
@@ -205,10 +214,12 @@ public:
 static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> right) {
     if (left->getType() != right->getType()) {
         // throw ex - types must be eq
+        throw std::runtime_error("error");
         exit(-1);
     }
     if (left->getType() == Type::Empty) {
         // throw ex - types must be not empty
+        throw std::runtime_error("error");
         exit(-1);
     }
 
@@ -244,6 +255,7 @@ static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbTy
         return dynamic_cast<DbString*>(left.get())->doOp(op, dynamic_cast<DbString*>(right.get()));
     default:
         // throw ex - unexp type used in operation
+        throw std::runtime_error("error");
         exit(-1);
         break;
     }
@@ -268,11 +280,17 @@ class DbType_s { //: public DbTypeMassoP<T> {
 public:
     T get(ssize_t ind) {
         // throw ex if not exist
+        if (v.find(ind) == v.end()) {
+            throw std::runtime_error("error");
+        }
         return v[ind];
     }
 
     void* getp(ssize_t ind) {
         // throw ex if not exist
+        if (v.find(ind) == v.end()) {
+            throw std::runtime_error("error");
+        }
         return static_cast<void*>(&v[ind]);
     }
 
@@ -280,6 +298,9 @@ public:
         res.reserve(inds.size());
         for (ssize_t i : inds) {
              // throw ex if not exist
+            if (v.find(i) == v.end()) {
+                throw std::runtime_error("error");
+            }
             res.emplace_back(v[i]);
         }
     }
@@ -288,6 +309,9 @@ public:
         for (int i = 0; i < sz; i++) {
             if (is_fine[i]) {
                 // throw ex if not exist
+                if (v.find(i) == v.end()) {
+                    throw std::runtime_error("error");
+                }
                 res.emplace_back(v[i]);
             }
         }
@@ -297,13 +321,19 @@ public:
         for (int i = 0; i < sz; i++) {
             if (is_fine[i]) {
                 // throw ex if not exist
+                if (v.find(i) == v.end()) {
+                    throw std::runtime_error("error");
+                }
                 res.emplace_back(static_cast<void*>(&v[i]));
             }
         }
     }
 
     void update(ssize_t ind, T& obj) {
-         // throw ex if not exist
+        // throw ex if not exist
+        if (v.find(ind) == v.end()) {
+            throw std::runtime_error("error");
+        }
         v[ind] = obj;
     }
 
@@ -318,6 +348,9 @@ public:
 
     void del(int ind) {
         // throw ex if not exist
+        if (v.find(ind) == v.end()) {
+            throw std::runtime_error("error");
+        }
         v.erase(ind);
         fl.erase_after(ind2it[ind]);
         ind2it.erase(ind);
@@ -349,7 +382,7 @@ public:
         return sz;
     }
 
-    using FLIt = std::__forward_list_iterator<std::__forward_list_node<long, void *> *>;
+    using FLIt = std::forward_list<ssize_t>::iterator;
     FLIt begin() {
         return fl.begin();
     }

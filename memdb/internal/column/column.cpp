@@ -98,6 +98,7 @@ public:
             return cur.push(defVal.value());
         }
         // throw ex
+        throw std::runtime_error("error");
         return -1;
     }
 

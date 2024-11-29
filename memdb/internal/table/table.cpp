@@ -20,6 +20,7 @@ struct TableView {
         T& Get(std::string_view colName) {
             if (col2ind.find(colName) == col2ind.end()) {
                 // throw ex
+                throw std::runtime_error("error");
                 exit(-1);
             }
             return *static_cast<T>(data[col2ind[colName]]);
@@ -91,6 +92,7 @@ public:
     Table(const std::string_view& tName_) : tName(tName_){};
     void AddColumn(const ColumnType& colTp, const ColumnDescription& descr) { // nullptr
         if (name2Ind.find(descr.name) != name2Ind.end()) {
+            throw std::runtime_error("error");
             exit(-1); // throw exc
         }
         std::shared_ptr<Column> newCol;
@@ -123,7 +125,7 @@ public:
         columns.emplace_back(newCol);
     }
 
-    void Insert(const std::vector<Value>& values) {
+    void Insert(std::vector<Value>& values) {
         bool listType = false;
         bool mapType = false;
 
@@ -141,19 +143,23 @@ public:
                 auto curCol = name2Ind.find(value.fName);
                 if (setted[curCol->second] != -1) {
                     // throw ex - col names should be unique
+                    throw std::runtime_error("error");
                 }
                 setted[curCol->second] = i;
             } else {
                 // throw ex - should be correct
+                throw std::runtime_error("error");
             }
         }
         if (listType && mapType) {
             // throw ex - should be one of these
+            throw std::runtime_error("error");
         }
 
         if (listType) {
-             if (values.size() != columns.size()) {
+            if (values.size() != columns.size()) {
                 // throw ex - should be one per each col
+                throw std::runtime_error("error");
             }
             std::iota(setted.begin(), setted.end(), 0);
         }
@@ -171,10 +177,12 @@ public:
         for (auto& tc : need) {
             if (tc.table != tName && tc.table != "") {
                 // throw ex - unexp table name got
+                throw std::runtime_error("error");
                 exit(-1);
             }
             if (name2Ind.find(tc.column) == name2Ind.end()) {
-                    // throw ex - unexp column name got
+                // throw ex - unexp column name got
+                throw std::runtime_error("error");
                 exit(-1);
             }
             if (tc.table == "") {
@@ -202,6 +210,7 @@ public:
             auto res = cond.Compute(vals);
             if (res->getType() != Type::Bool) {
                 // throw ex expected bool as a result of where cond
+                throw std::runtime_error("error");
                 exit(-1);
             }
             isFine[ind] = getValue<DbBool, bool>(res);
@@ -251,6 +260,7 @@ public:
             colAmt++;
             if (name2Ind.find(tc.column) != name2Ind.end()) {
                 // throw ex not found column in table
+                throw std::runtime_error("error");
                 exit(-1);
             }
         }
@@ -274,6 +284,7 @@ public:
             }
             curInd++;
         }
+        return TableView(name2Ind, data);
     }
 
 private:

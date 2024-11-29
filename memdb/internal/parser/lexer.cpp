@@ -271,6 +271,7 @@ static std::shared_ptr<Token> getSharedToken(T* val) {
 }
 
 struct CommandT : public Token {
+    public:
     CommandT() {};
     CommandT(lexer::Command t_) : t(t_){};
     TokenT GetType() const override {
@@ -294,6 +295,7 @@ struct CommandT : public Token {
 };
 
 struct SubCommandT : public Token {
+    public:
     SubCommandT(){};
     SubCommandT(lexer::SubCommand t_) : t(t_){};
     TokenT GetType() const override {
@@ -317,6 +319,7 @@ struct SubCommandT : public Token {
 };
 
 struct AttributeT : public Token {
+    public:
     AttributeT(){};
     AttributeT(lexer::Attribute t_) : t(t_){};
     TokenT GetType() const override {
@@ -340,6 +343,7 @@ struct AttributeT : public Token {
 };
 
 struct OtherT : public Token {
+    public:
     OtherT(){};
     OtherT(lexer::Other t_) : t(t_){};
     TokenT GetType() const override {
@@ -364,6 +368,7 @@ struct OtherT : public Token {
 
 
 struct OperationT : public Token {
+    public:
     OperationT(){};
     OperationT(Operation t_) : t(t_){};
     TokenT GetType() const override {
@@ -387,6 +392,7 @@ struct OperationT : public Token {
 };
 
 struct BracketT : public Token {
+    public:
     BracketT(){};
     BracketT(lexer::Bracket t_) : t(t_){};
     TokenT GetType() const override {
@@ -410,6 +416,7 @@ struct BracketT : public Token {
 };
 
 struct ColumnTypeT : public Token {
+    public:
     ColumnTypeT() : t(ColumnType{Type::Empty}){};
     ColumnTypeT(ColumnType t_) : t(t_){};
     TokenT GetType() const override {
@@ -436,6 +443,7 @@ struct ColumnTypeT : public Token {
 };
 
 struct DBTypeT : public Token {
+    public:
     DBTypeT(){};
     DBTypeT(std::shared_ptr<DbType> t_) : t(t_){};
     TokenT GetType() const override {
@@ -490,6 +498,7 @@ struct DBTypeT : public Token {
 };
 
 struct StringT : public Token {
+    public:
     StringT(){};
     StringT(std::string t_) : t(t_){};
     TokenT GetType() const override {
@@ -548,6 +557,7 @@ std::pair<std::string, std::string> ParseTableColumn(const std::string& s) {
     ssize_t dotInd= 0;
     if ((dotInd = s.find_first_of('.')) != s.find_last_of('.')) {
         // throw ex - names cant have .
+        throw std::runtime_error("error");
         exit(-1);
     }
 

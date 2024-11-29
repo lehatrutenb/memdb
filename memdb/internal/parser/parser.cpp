@@ -10,6 +10,7 @@
 #include "inserIndex.cpp"
 #include "assignments.cpp"
 #include "selectValues.cpp"
+#include <iostream>
 
 //#include "objects.cpp"
 /*
@@ -62,6 +63,7 @@ struct CmdParser {
 };
 
 class CreateTableParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::CREATE_TABLE;
     }
@@ -73,17 +75,19 @@ class CreateTableParser : public CmdParser {
 };
 
 class InsertParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::INSERT;
     }
 
     bool Check(parser::TokenStructure& ts) override {
-        return ts.getCmd(lexer::Command::INSERT) == 0 && ts.getScmd(lexer::SubCommand::TO) == 0 &&
+        return ts.getCmd(lexer::Command::INSERT) == 0 && ts.getScmd(lexer::SubCommand::TO) == ts.Tokens.size() - 2 &&
                ts.Tokens[ts.Tokens.size() - 1]->GetType() == Tokenizer::TokenT::STRING;
     }
 };
 
 class SelectParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::SELECT;
     }
@@ -95,6 +99,7 @@ class SelectParser : public CmdParser {
 };
 
 class UpdateParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::UPDATE;
     }
@@ -106,6 +111,7 @@ class UpdateParser : public CmdParser {
 };
 
 class DeleteParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::DELETE;
     }
@@ -117,6 +123,7 @@ class DeleteParser : public CmdParser {
 };
 
 class JoinParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::JOIN;
     }
@@ -130,6 +137,7 @@ class JoinParser : public CmdParser {
 
 
 class CrateIndexParser : public CmdParser {
+    public:
     ParserT getType() const override {
         return ParserT::CREATE_INDEX;
     }
@@ -139,8 +147,8 @@ class CrateIndexParser : public CmdParser {
                ts.getScmd(lexer::SubCommand::ON) == 3 && ts.getScmd(lexer::SubCommand::BY) == 5 &&
                ts.Tokens[1]->GetType() == Tokenizer::TokenT::ATTRIBUTE &&
                ts.Tokens[4]->GetType() == Tokenizer::TokenT::STRING &&
-               getValue<Tokenizer::AttributeT, lexer::Attribute>(ts.Tokens[1]) == lexer::Attribute::ORDERED ||
-               getValue<Tokenizer::AttributeT, lexer::Attribute>(ts.Tokens[1]) == lexer::Attribute::UNORDERED;
+               (getValue<Tokenizer::AttributeT, lexer::Attribute>(ts.Tokens[1]) == lexer::Attribute::ORDERED ||
+               getValue<Tokenizer::AttributeT, lexer::Attribute>(ts.Tokens[1]) == lexer::Attribute::UNORDERED);
     }
 };
 
@@ -202,6 +210,7 @@ public:
 
         if (insideLen || insideString) {
             // throw ex - string or len not closed
+            throw std::runtime_error("error");
             exit(-1);
         }
 
@@ -214,10 +223,11 @@ public:
 
         if (tokens.empty()) {
             //throw ex - empty request
+            throw std::runtime_error("error");
             exit(-1);
         }
 
-        return parser::TokenStructure(std::move(tokens), l, r);
+        return parser::TokenStructure(std::move(tokens), 0, tokens.size() - 1);
     }
 
     
@@ -231,6 +241,7 @@ public:
 
         if (insideLen || insideString) {
             // throw ex - string or len not closed
+            throw std::runtime_error("error");
             exit(-1);
         }
 
@@ -243,16 +254,19 @@ public:
 
         if (tokens.empty()) {
             //throw ex - empty request
+            throw std::runtime_error("error");
             exit(-1);
         }
 
         if (tokens.size() <= 2) {
             // throw ex - incorrect req
+            throw std::runtime_error("error");
             exit(-1);
         }
 
         if (tokens[0]->GetType() != Tokenizer::TokenT::COMMAND) {
             // throw ex - incorrect req
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (parser::getValue<Tokenizer::CommandT, lexer::Command>(tokens[0]) != lexer::Command::CREATE) {
@@ -273,6 +287,7 @@ public:
 
         if (insideLen || insideString) {
             // throw ex - string or len not closed
+            throw std::runtime_error("error");
             exit(-1);
         }
 
@@ -285,16 +300,19 @@ public:
 
         if (tokens.empty()) {
             //throw ex - empty request
+            throw std::runtime_error("error");
             exit(-1);
         }
 
         if (tokens.size() <= 2) {
             // throw ex - incorrect req
+            throw std::runtime_error("error");
             exit(-1);
         }
 
         if (tokens[0]->GetType() != Tokenizer::TokenT::COMMAND) {
             // throw ex - incorrect req
+            throw std::runtime_error("error");
             exit(-1);
         }
         if (parser::getValue<Tokenizer::CommandT, lexer::Command>(tokens[0]) != lexer::Command::INSERT) {
