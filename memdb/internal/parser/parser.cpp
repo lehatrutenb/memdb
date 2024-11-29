@@ -8,6 +8,8 @@
 #include "condition.cpp"
 #include "createColumns.cpp"
 #include "inserIndex.cpp"
+#include "assignments.cpp"
+#include "selectValues.cpp"
 
 //#include "objects.cpp"
 /*
@@ -40,6 +42,121 @@ create unordered index on users by is_admin
 */
 
 namespace memdb {
+namespace parser {
+
+
+enum class ParserT {
+        CREATE_TABLE,
+        INSERT,
+        SELECT,
+        UPDATE,
+        DELETE,
+        JOIN,
+        CREATE_INDEX,
+        UNKNOWN
+    };
+
+struct CmdParser {
+    virtual ParserT getType() const = 0;
+    virtual bool Check(parser::TokenStructure& ts) = 0;
+};
+
+class CreateTableParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::CREATE_TABLE;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::CREATE) == 0 && ts.getScmd(lexer::SubCommand::TABLE) == 1 &&
+               ts.Tokens.size() >= 2 && ts.Tokens[2]->GetType() == Tokenizer::TokenT::STRING;
+    }
+};
+
+class InsertParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::INSERT;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::INSERT) == 0 && ts.getScmd(lexer::SubCommand::TO) == 0 &&
+               ts.Tokens[ts.Tokens.size() - 1]->GetType() == Tokenizer::TokenT::STRING;
+    }
+};
+
+class SelectParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::SELECT;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::SELECT) == 0 && ts.getScmd(lexer::SubCommand::FROM) != -1 &&
+               ts.getScmd(lexer::SubCommand::WHERE) > ts.getScmd(lexer::SubCommand::FROM);
+    }
+};
+
+class UpdateParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::UPDATE;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::UPDATE) == 0 && ts.getScmd(lexer::SubCommand::SET) != -1 &&
+               ts.getScmd(lexer::SubCommand::WHERE) > ts.getScmd(lexer::SubCommand::SET);
+    }
+};
+
+class DeleteParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::DELETE;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::DELETE) == 0 && ts.getScmd(lexer::SubCommand::WHERE) == 2 &&
+               ts.Tokens[1]->GetType() == Tokenizer::TokenT::STRING;
+    }
+};
+
+class JoinParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::JOIN;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::JOIN) == 1 && ts.getScmd(lexer::SubCommand::ON) == 3 &&
+               ts.Tokens[0]->GetType() == Tokenizer::TokenT::STRING &&
+               ts.Tokens[2]->GetType() == Tokenizer::TokenT::STRING;
+    }
+};
+
+
+class CrateIndexParser : public CmdParser {
+    ParserT getType() const override {
+        return ParserT::CREATE_INDEX;
+    }
+
+    bool Check(parser::TokenStructure& ts) override {
+        return ts.getCmd(lexer::Command::CREATE) == 0 && ts.getScmd(lexer::SubCommand::INDEX) == 2 &&
+               ts.getScmd(lexer::SubCommand::ON) == 3 && ts.getScmd(lexer::SubCommand::BY) == 5 &&
+               ts.Tokens[1]->GetType() == Tokenizer::TokenT::ATTRIBUTE &&
+               ts.Tokens[4]->GetType() == Tokenizer::TokenT::STRING &&
+               getValue<Tokenizer::AttributeT, lexer::Attribute>(ts.Tokens[1]) == lexer::Attribute::ORDERED ||
+               getValue<Tokenizer::AttributeT, lexer::Attribute>(ts.Tokens[1]) == lexer::Attribute::UNORDERED;
+    }
+};
+
+template<typename T>
+static std::shared_ptr<CmdParser> getSharedParser() {
+    std::shared_ptr<CmdParser> res{new T{}};
+    return res;
+}
+
+
+static std::vector<std::shared_ptr<CmdParser>> Parsers = {
+                                                        getSharedParser<CreateTableParser>(), getSharedParser<InsertParser>(), 
+                                                        getSharedParser<SelectParser>(), getSharedParser<UpdateParser>(),
+                                                        getSharedParser<DeleteParser>(), getSharedParser<JoinParser>(),
+                                                        getSharedParser<CrateIndexParser>()
+                                                        };
 
 class Parser {
 public:
@@ -63,7 +180,7 @@ public:
 
 /*
     std::pair<std::string_view, std::string_view> ParseTableColumn(const std::string_view& s) {
-        ssize_t dotInd= 0;
+        sssize_t dotInd= 0;
         if ((dotInd = s.find_first_of('.')) != s.find_last_of('.')) {
             // throw ex - names cant have .
             exit(-1);
@@ -75,7 +192,8 @@ public:
         return {"", s};
     }*/
 
-    /*void Parse(const std::string_view& preS, int l, int r) { // return struct not void TODO
+
+    parser::TokenStructure Parse(const std::string_view& preS, int l, int r) { // return struct not void TODO
         std::string s = "";
         bool insideString = false, insideLen = false;
         for (int i = l; i <= r; i++) { // to parse words with spaces between
@@ -99,10 +217,10 @@ public:
             exit(-1);
         }
 
-        //auto res = parser::ConditionParser{}.Parse(tokens, 1, tokens.size() - 1);
-        //auto res = parser::ColumnParser{}.Parse(tokens, 0, tokens.size() - 1);
-        //auto res = parser::InserValuesParser{}.Parse(tokens, 0, tokens.size() - 1);
-    }*/
+        return parser::TokenStructure(std::move(tokens), l, r);
+    }
+
+    
 
     std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> ParseCreate(const std::string_view& preS, int l, int r) { // return struct not void TODO
         std::string s = "";
@@ -190,6 +308,7 @@ public:
     }
 };
 
+}
 }
 
 /*

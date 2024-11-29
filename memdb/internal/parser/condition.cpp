@@ -43,24 +43,25 @@ struct Condition {
     Condition(Operation op, std::shared_ptr<Condition> left_, std::shared_ptr<Condition> right_) : isLeaf(false), leftCond(left_), rightCond(right_), Op(op) {}
     Condition(Operation op, std::shared_ptr<Condition> left_) : isLeaf(false), leftCond(left_), rightCond({}), Op(op) {}
 
-    std::vector<std::pair<std::string, std::string>> SetWhatNeed() const { // pair not to write struct currently TODO
-        std::vector<std::pair<std::string, std::string>> res;
+    std::vector<TableColumn> GetWhatNeed() const {
+        std::vector<TableColumn> res;
         getWhatNeed(res);
         std::sort(res.begin(), res.end());
         res.erase(std::unique(res.begin(), res.end()), res.end()); // not to get from db twice
         return res;
     }
 
-    void SetWhatNeed(std::map<std::pair<std::string, std::string>, std::shared_ptr<DbType>>& vals) {
+    /*
+    void SetWhatNeed(std::map<TableColumn, std::shared_ptr<DbType>>& vals) { // move vals to compute cause want to use not once so don't want to check if valvaset of it was from the beginning 
         if (isLeaf) {
             if (leaf->hasVal) {
                 return;
             }
-            if (vals.find({leaf->table, leaf->column}) == vals.end()) {
+            if (vals.find(TableColumn(leaf->table, leaf->column)) == vals.end()) {
                 return;
             }
             leaf->hasVal = true;
-            leaf->val = vals[{leaf->table, leaf->column}];
+            leaf->val = vals[TableColumn(leaf->table, leaf->column)];
             return;
         }
         if (leftCond) {
@@ -69,21 +70,33 @@ struct Condition {
         if (rightCond) {
             rightCond->SetWhatNeed(vals);
         }
+    }*/
+
+    std::shared_ptr<DbType> getLeafVal(std::map<TableColumn, std::shared_ptr<DbType>>& vals) const {
+        if (leaf->hasVal) {
+            return leaf->val;
+        }
+        if (vals.find(TableColumn(leaf->table, leaf->column)) == vals.end()) { // TODO check if correct to use leaf->table
+            // throw ex - not found val at compute moment
+            exit(-1);
+        }
+        return vals[TableColumn(leaf->table, leaf->column)];
     }
 
-    std::shared_ptr<DbType> Compute() {
+    std::shared_ptr<DbType> Compute(std::map<TableColumn, std::shared_ptr<DbType>>& vals) const {
         if (isLeaf) {
-            if (!leaf->hasVal) {
+            /*if (!leaf->hasVal) {
                 // throw ex - val should be on that moment
                 exit(-1);
             }
-            return leaf->val;
+            return leaf->val;*/
+            return getLeafVal(vals);
         }
 
         if (IsMathOp(Op)) {
             if (leftCond && rightCond) {
-                auto leftRes = leftCond->Compute()->Copy();
-                DoOp(Op, leftRes, rightCond->Compute()); // will update left
+                auto leftRes = leftCond->Compute(vals)->Copy();
+                DoOp(Op, leftRes, rightCond->Compute(vals)); // will update left
                 return leftRes;
             } else {
                 // throw ex - 2 operands op
@@ -93,7 +106,7 @@ struct Condition {
 
         if (IsCmpOp(Op)) {
             if (leftCond && rightCond) {
-                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(), rightCond->Compute()))};
+                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(vals), rightCond->Compute(vals)))};
                 return resObj;
             } else {
                 // throw ex - 2 operands op
@@ -103,7 +116,7 @@ struct Condition {
 
         if (Op == Operation::LEN) {
             if (rightCond) {
-                auto rightRes = rightCond->Compute();
+                auto rightRes = rightCond->Compute(vals);
                 std::shared_ptr<DbType> resObj{new DbInt32(DoOp(Op, rightRes, rightRes))};
                 return resObj;
             } else {
@@ -114,7 +127,7 @@ struct Condition {
 
         if (IsBoolOp(Op)) {
             if (Op == Operation::NOT) {
-                auto rightRes = rightCond->Compute();
+                auto rightRes = rightCond->Compute(vals);
                 std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, rightRes, rightRes))};
                 return resObj;
             } else {
@@ -122,7 +135,7 @@ struct Condition {
                     // throw ex - 2 op op
                     exit(-1);
                 }
-                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(), rightCond->Compute()))};
+                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftCond->Compute(vals), rightCond->Compute(vals)))};
                 return resObj;
             }
         }
@@ -172,13 +185,13 @@ struct Condition {
     // getWhatNeed and setWhatNeed not crush logic with || cause talbe will return empty values if can't get and they will be checked in compute
 
     private:
-    void getWhatNeed(std::vector<std::pair<std::string, std::string>>& res) const {
+    void getWhatNeed(std::vector<TableColumn>& res) const {
         if (isLeaf) {
             if (leaf->hasVal) {
                 return;
             }
             if (leaf->column != "") { // otherwise it is const or already set or ... // table == "" is ok if just 1 table given
-                res.push_back({leaf->table, leaf->column}); // that is inside object to it is safe
+                res.push_back(TableColumn(leaf->table, leaf->column)); // that is inside object to it is safe
             } else {
                 // throw ex - column must be set
                 exit(-1);
@@ -231,6 +244,10 @@ struct ConditionT : public Tokenizer::Token {
 
 struct ConditionParser {
     Condition Parse(const std::vector<std::shared_ptr<Tokenizer::Token>>& inp, ssize_t l, ssize_t r) {
+        if (l > r) {
+            // throw ex - expected to get not empty expression
+            exit(-1);
+        }
         if (l == r) {
             if (inp[l]->GetType() == Tokenizer::TokenT::STRING) {
                 auto parsed = ParseTableColumn(dynamic_cast<const Tokenizer::StringT*>(inp[l].get())->t);

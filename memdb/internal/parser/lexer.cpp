@@ -26,7 +26,9 @@ namespace lexer {
         SET,
         FROM,
         INDEX,
-        TABLE
+        TABLE,
+        TO,
+        BY
     };
 
     enum class Attribute {
@@ -66,7 +68,7 @@ namespace lexer {
     };
 
     std::map<std::string_view, SubCommand> s2sc = {
-        {"where", SubCommand::WHERE}, {"on", SubCommand::ON}, {"set", SubCommand::SET}, {"from", SubCommand::FROM}, {"index", SubCommand::INDEX}, {"table", SubCommand::TABLE}
+        {"where", SubCommand::WHERE}, {"on", SubCommand::ON}, {"set", SubCommand::SET}, {"from", SubCommand::FROM}, {"index", SubCommand::INDEX}, {"table", SubCommand::TABLE}, {"to", SubCommand::TO}, {"to", SubCommand::BY}
     };
 
     std::map<std::string_view, Attribute> s2a = {
@@ -530,6 +532,16 @@ template<typename T, typename U>
 U getValue(std::shared_ptr<Tokenizer::Token> token) {
     return dynamic_cast<T*>(token.get())->t;
 }
+
+
+template<typename T, typename U>
+int getNextToken(const std::vector<std::shared_ptr<Tokenizer::Token>>& ts, ssize_t ind, ssize_t r, Tokenizer::TokenT tokenTExp, U resExp) {
+    for (; ind <= r; ind++) {
+        if (ts[ind]->GetType() == tokenTExp && getValue<T, U>(ts[ind]) == resExp) {
+            return ind;
+        }
+    }
+    return -1;
 }
 
 std::pair<std::string, std::string> ParseTableColumn(const std::string& s) {
@@ -543,6 +555,49 @@ std::pair<std::string, std::string> ParseTableColumn(const std::string& s) {
         return {s.substr(dotInd), s.substr(dotInd + 1, static_cast<int>(s.size()) - static_cast<int>(dotInd) - 1)};
     }
     return {"", s};
+}
+
+struct TokenStructure {
+    template<typename T>
+    struct ValueInd {
+        T val;
+        ssize_t ind;
+    };
+
+    std::vector<ValueInd<lexer::Command>> Commands;
+    std::vector<ValueInd<lexer::SubCommand>> SubCommands;
+    std::map<lexer::Command, ssize_t> C2i;
+    std::map<lexer::SubCommand, ssize_t> Sc2i;
+    std::vector<std::shared_ptr<Tokenizer::Token>> Tokens;
+
+    int getCmd(lexer::Command cmd) {
+        if (C2i.find(cmd) == C2i.end()) {
+            return -1;
+        }
+        return C2i[cmd];
+    }
+
+    int getScmd(lexer::SubCommand cmd) {
+        if (Sc2i.find(cmd) == Sc2i.end()) {
+            return -1;
+        }
+        return Sc2i[cmd];
+    }
+
+    TokenStructure(const std::vector<std::shared_ptr<Tokenizer::Token>>&& tokens, ssize_t l, ssize_t r) : Tokens(std::move(tokens)) {
+        for (int i = l; i <= r; ++i) {
+            if (Tokens[i]->GetType() == Tokenizer::TokenT::COMMAND) {
+                auto cmd = getValue<Tokenizer::CommandT, lexer::Command>(Tokens[i]);
+                Commands.push_back({cmd, i});
+                C2i[cmd] = i;
+            } else if (Tokens[i]->GetType() == Tokenizer::TokenT::SUBCOMMAND) {
+                auto subCmd = getValue<Tokenizer::SubCommandT, lexer::SubCommand>(Tokens[i]);
+                SubCommands.push_back({subCmd, i});
+                Sc2i[subCmd] = i;
+            }
+        }
+    }
+};
 }
 }
 

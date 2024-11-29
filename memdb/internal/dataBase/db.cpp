@@ -1,10 +1,11 @@
 #pragma once
 #include <string_view>
+#include <map>
 #include "../table/table.cpp"
 #include "../parser/parser.cpp"
 
 /*
-доп ограничения:
+доп ограничения/ доп возможности:
 1. Join надо обернуть в скобки
 2. Если есть join то писать обязательно on
 3. Update c join не будет ?
@@ -13,7 +14,12 @@
 5. названия таблиц и колоннок не начинаются с цифр
 6. -1 и подобные числа с однооперандным -/+ не парсятся
 7. символы названий таблиц/колонок: isdigit(ch) || isalpha(ch) || ch == '.' || ch == '"' || ch == '_' || ch == '#' || ch == '@'
+8. |"asdsa" + "adas" + "a"| разрешено
+9. решил не забирать возможность - condition (where) можно с и составить так, что если колонки никогда не будут нужны, то туда можно писать некорректные
+9.1 чтобы убрать - добавить if в computecondition
+10. колонкам разрешено меняться в зависимости от других колонок этой же таблички и изм будут как 1 тразакция (a = "1" b = "2" a = a+b, b =b+a -> a=12 b = 21)
 что можно легко добавить:
+11. разрешено писать select col1 from table1 where ... вместо select table1.col1 from table1 where если табличка всего одна
 1. разрешить использовать оба типа при insert одновременно
 */
 
@@ -22,15 +28,18 @@ class Database {
 public:
     Database()=default;
 
-    void CreateTable(const std::string_view& tName, const std::vector<ColumnType>& colTps_, const std::vector<ColumnDescription>& colDescripts) {
-        colTps = colTps_;
+    void CreateTable(const std::string_view& tName, const std::vector<ColumnFullDescription>& colDescripts) {
         // throw ex i f colDescripts and colTps not same size
         if (tName2ind.find(tName) != tName2ind.end()) {
             // throw ex - table names should be unique
         }
-        tables.emplace_back(Table{});
+        tables.emplace_back(Table{tName});
+        //colTps.push_back({});
+        //colTps.back().resize(colDescripts.size());
+    
         for (int i = 0; i < colDescripts.size(); i++) {
-            tables.back().AddColumn(colTps[i], colDescripts[i]);
+            tables.back().AddColumn(colDescripts[i], colDescripts[i]);
+            //colTps.back()[i] = colDescripts[i];
         }
     }
 
@@ -41,7 +50,89 @@ public:
         tables[tName2ind[tName]].Insert(values);
     }
 
-    void Execute(const std::string_view& request) { // not void
+    void Update(const std::string_view& tName, parser::Assignments& dataToUpdate, parser::Condition& condition) {
+        if (tName2ind.find(tName) == tName2ind.end()) {
+            // throw ex
+        }
+        tables[tName2ind[tName]].Update(dataToUpdate, condition);
+    }
+
+    std::optional<TableView> Select(const std::vector<TableColumn>& tcs, parser::Condition& condWh, std::string& tableName) { // if want to select from multiply tables - add code here not in tables - just merge them
+        if (tcs.empty()) {
+            return {};
+        }
+        if (tableName == "" && tables.size() == 1) { // if single table in db can not to write it
+            tableName = tName2ind.begin()->first;
+        }
+        if (tName2ind.find(tcs[0].table) == tName2ind.end()) {
+            // throw ex table not found
+            exit(-1);
+        }
+        return tables[tName2ind[tcs[0].table]].Select(tcs, condWh);
+    }
+
+    std::optional<TableView> Execute(const std::string_view& request) { // not void
+        if (request.size() == 0) {
+            return {};
+        }
+
+        parser::TokenStructure ts = parser::Parser{}.Parse(request, 0, request.size() - 1);
+        parser::ParserT resParser = parser::ParserT::UNKNOWN;
+        for (auto prsr: parser::Parsers) {
+            if (prsr->Check(ts)) {
+                resParser = prsr->getType();
+                break;
+            }
+        }
+
+        std::vector<std::shared_ptr<Tokenizer::Token>>& tokens = ts.Tokens;
+
+        std::string tableName;
+        parser::ColumnDescriptions columnFullDescription;
+        parser::InsertData dataToInsert;
+        parser::Assignments dataToUpdate;
+        parser::SelectData dataToSelect;
+        parser::Condition condition;
+        switch (resParser) { // if i get parser type than acces to every token is safe
+        case parser::ParserT::CREATE_TABLE:
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens[2]);
+            columnFullDescription = parser::ColumnParser{}.Parse(tokens, 3, tokens.size() - 1);
+            CreateTable(tableName, columnFullDescription.info);
+            break;
+        case parser::ParserT::INSERT:
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens.back());
+            dataToInsert = parser::InserValuesParser{}.Parse(tokens, 1, ts.getScmd(lexer::SubCommand::TO) - 1);
+            Insert(tableName, dataToInsert.data);
+            break;
+        case parser::ParserT::SELECT:
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens[ts.getScmd(lexer::SubCommand::FROM) + 1]);
+            dataToSelect = parser::SelectValuesParser{}.Parse(tokens, 1, ts.getScmd(lexer::SubCommand::FROM) - 1);
+            condition = parser::ConditionParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::WHERE) + 1, tokens.size() - 1);
+            return Select(dataToSelect.Data, condition, tableName);
+        case parser::ParserT::UPDATE:
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens.back());
+            dataToUpdate = parser::AssignmentsParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::SET) + 1, ts.getScmd(lexer::SubCommand::WHERE) - 1);
+            condition = parser::ConditionParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::WHERE) + 1, tokens.size() - 1);
+            Update(tableName, dataToUpdate, condition);
+            break;
+        case parser::ParserT::DELETE:
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens.back());
+            condition = parser::ConditionParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::WHERE) + 1, tokens.size() - 1);
+            //Delete(tableName, condition);
+            break;
+        case parser::ParserT::JOIN:
+            break;
+        case parser::ParserT::CREATE_INDEX:
+            break;
+        default:
+            // throw ex unknown request
+            exit(-1);
+        }
+
+        return {};
+    }
+
+    /*void Execute(const std::string_view& request) { // not void
         auto res1 = Parser{}.ParseCreate(request, 0, request.size() - 1);
         auto res2 = Parser{}.ParseInsert(request, 0, request.size() - 1);
 
@@ -56,12 +147,12 @@ public:
         } else {
             Insert(res2.second.first, res2.second.second.data);
         }
-    }
+    }*/
 
 private:
     std::vector<Table> tables;
     std::map<std::string_view, ssize_t> tName2ind;
-    std::vector<ColumnType> colTps;
+    //std::vector<std::vector<ColumnType>> colTps;
 };
 
 /*
@@ -91,14 +182,20 @@ enum class ColumnAttrs {
 }
 
 using namespace memdb;
-
+/*
+insert (,"vasya", 0xdeadbeefdeadbeef) to users
+insert (login = "vasya", password_hash = 0xdeadbeefdeadbeef) to users
+insert (,"admin", 0x0000000000000000, true) to users
+*/
 int main() {
     Database db;
-    std::string_view req1 = "create table users ({key, autoincrement} id : int32 = 5)";
-    std::string_view req2 = "insert (,) to users";
+    std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
+    std::string_view req2 = "insert (,\"vasya\", 0xdeadbeefdeadbeef) to users";
+    std::string_view req3 = "insert (,\"vasya\", 0xdeadbeefdeadbeef) to users";
+    std::string_view req4 = "insert (,\"admin\", 0x0000000000000000, true) to users";
 
     db.Execute(req1);
-    db.Execute(req2);
+    //db.Execute(req2);
     int x;
     /*const std::string_view tName = "table1";
     std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
