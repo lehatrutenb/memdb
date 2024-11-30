@@ -85,10 +85,18 @@ public:
             exit(-1);
         }
 
-        for (auto row: tables[tName2ind[tableName]].Select(tcs, condWh)) {
+        /*for (auto row: tables[tName2ind[tableName]].Select(tcs, condWh)) {
             std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-        }
+        }*/
         return std::optional<TableView>{tables[tName2ind[tableName]].Select(tcs, condWh)};
+    }
+
+    void Delete(std::string& tName, parser::Condition& condWh) { // if want to select from multiply tables - add code here not in tables - just merge them
+        if (tName2ind.find(tName) == tName2ind.end()) {
+            // throw ex
+            throw std::runtime_error("error");
+        }
+        tables[tName2ind[tName]].Delete(condWh);
     }
 
     std::optional<TableView> Execute(const std::string_view& request) { // not void
@@ -130,15 +138,15 @@ public:
             condition = parser::ConditionParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::WHERE) + 1, tokens.size() - 1);
             return Select(dataToSelect.Data, condition, tableName);
         case parser::ParserT::UPDATE:
-            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens.back());
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens[1]);
             dataToUpdate = parser::AssignmentsParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::SET) + 1, ts.getScmd(lexer::SubCommand::WHERE) - 1);
             condition = parser::ConditionParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::WHERE) + 1, tokens.size() - 1);
             Update(tableName, dataToUpdate, condition);
             break;
         case parser::ParserT::DELETE:
-            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens.back());
+            tableName = parser::getValue<Tokenizer::StringT, std::string>(tokens[1]);
             condition = parser::ConditionParser{}.Parse(tokens, ts.getScmd(lexer::SubCommand::WHERE) + 1, tokens.size() - 1);
-            //Delete(tableName, condition);
+            Delete(tableName, condition);
             break;
         case parser::ParserT::JOIN:
             break;
@@ -216,15 +224,54 @@ int main() {
     std::string_view req4 = R"(insert (,"admin", 0x0000000000000000, true) to users)";
     std::string_view req5 = R"(select id, login from users where is_admin)";
     std::string_view req6 = R"(select id, login from users where is_admin || id < 10)";
+    std::string_view req7 = R"(update users set is_admin = true where login = "vasya")";
+    std::string_view req8 = R"(update users set login = login + "_deleted", is_admin = false where password_hash < 0x00000000ffffffff)";
+    //std::string_view req9 = R"(delete users where |login| % 2 = 0)";
+    std::string_view req9 = R"(delete users where login = "vasya")";
+    std::string_view req9_1 = R"(select id, login from users where login = "vasya")";
 
     db.Execute(req1);
     db.Execute(req2);
     db.Execute(req3);
     db.Execute(req4);
-    db.Execute(req5);
-    for (auto row: db.Execute(req5).value()) {
-        //std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+
+    { // update test
+        {
+            auto res = db.Execute(req9_1).value();
+            for (auto row: res) {
+                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+            }
+        }
+        std::string_view req10 = R"(update users set login = login + "123" where password_hash = 0xdeadbeefdeadbeef)";
+        db.Execute(req10);
+        {
+            std::string_view req9_2 = R"(select id, login from users where login = "vasya123")";
+            auto res = db.Execute(req9_2).value();
+            for (auto row: res) {
+                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+            }
+        }
     }
+
+    { // delete test
+        {
+            auto res = db.Execute(req9_1).value();
+            for (auto row: res) {
+                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+            }
+        }
+        db.Execute(req9);
+        {
+            auto res = db.Execute(req9_1).value();
+            for (auto row: res) {
+                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+            }
+        }
+    }
+    /*db.Execute(req5);
+    for (auto row: db.Execute(req5).value()) {
+        std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+    }*/
     
     int x;
     x = 1;

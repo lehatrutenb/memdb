@@ -53,6 +53,7 @@ public:
     virtual std::shared_ptr<DbType> Get(ssize_t ind) = 0;
     virtual void Get(std::vector<bool>& is_fine, std::vector<void*>& res) = 0;
     virtual void* GetP(ssize_t ind) = 0;
+    virtual void getInds(std::vector<ssize_t>& res) = 0;
 
     bool Unique() {
         return (rowTypeF&1) != 0;
@@ -144,6 +145,10 @@ friend ColumnInt32;
 
     ssize_t size()  override {
         return cur.size();
+    }
+
+    void getInds(std::vector<ssize_t>& res) override {
+        cur.getInds(res);
     }
 
 private:

@@ -7,6 +7,7 @@
 #include <map>
 #include <string_view>
 #include <numeric>
+#include <iostream>
 
 // it is not really max size - just size that will be allocated since start
 namespace memdb {
@@ -256,6 +257,31 @@ public:
         }
     }
 
+    void Delete(parser::Condition& condWh) {
+        where(condWh);
+
+        bool gotFineInds = false;
+        // and are there wait to write base loop
+        std::vector<ssize_t> inds;
+        columns[0]->getInds(inds);
+        /*for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
+            ssize_t ind = *it;
+            if (!isFine[ind]) {
+                continue;
+            }
+            inds.push_back(ind);
+        }*/
+
+        for (auto ind : inds) { // CARE it is safe cause we don't delete full colums and each col must have simular size
+            if (!isFine[ind]) {
+                continue;
+            }
+            for (int colInd = 0; colInd < columns.size(); colInd++) {
+                columns[colInd]->del(ind);
+            }
+        }
+    }
+
     //TableView(std::map<std::string, sssize_t>& col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_)  {}
     // Row(std::map<std::string, sssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
     TableView Select(const std::vector<TableColumn>& tcs, parser::Condition& condWh) {
@@ -292,6 +318,8 @@ public:
             }
             curInd++;
         }
+        auto res = TableView(name2Ind, data);
+        //std::cout <<&data << ' ' << &res.columns << ' ' << &res.columns[0] << ' ' << &res.col2ind << ' ' << &name2Ind << std::endl;
         return TableView(name2Ind, data);
     }
 

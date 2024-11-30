@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
+#include <iostream>
 
 namespace memdb {
 
@@ -394,7 +395,14 @@ public:
             throw std::runtime_error("error");
         }
         v.erase(ind);
-        fl.erase_after(ind2it[ind]);
+        auto it_prev = fl.before_begin();
+        auto it_nx = fl.begin();
+        while (*it_nx != ind) {
+            it_prev++;
+            it_nx++;
+        }
+        fl.erase_after(it_prev);
+        //fl.erase_after(ind2it[ind]);
         ind2it.erase(ind);
     }
 
@@ -422,6 +430,12 @@ public:
 
     ssize_t size() {
         return sz;
+    }
+
+    void getInds(std::vector<ssize_t>& res) {
+        for (auto ind : fl) {
+            res.push_back(ind);
+        }
     }
 
     using FLIt = std::forward_list<ssize_t>::iterator;
