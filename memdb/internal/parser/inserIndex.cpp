@@ -54,7 +54,7 @@ struct InserValuesParser {
         while (l <= r) {
             switch(inp[l]->GetType()) {
                 case Tokenizer::TokenT::OTHER:
-                    if (!skipComma) {
+                    if (!skipComma || l == r) { // l == r eq to abacaba,)
                         res.data.emplace_back(Table::Value(std::shared_ptr<DbType>{new DbTypeEmpty{}}));
                     }
                     l++;

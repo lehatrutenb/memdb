@@ -15,15 +15,15 @@ struct TableView {
     public:
     class Row {
         public:
-        Row(std::map<std::string_view, ssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
+        Row(std::map<std::string, ssize_t> col2ind_, std::vector<void*> data_) : rcol2ind(col2ind_), data(data_){};
         template<typename T>
-        T& Get(std::string_view colName) {
-            if (col2ind.find(colName) == col2ind.end()) {
+        T& Get(std::string colName) {
+            if (rcol2ind.find(colName) == rcol2ind.end()) {
                 // throw ex
                 throw std::runtime_error("error");
                 exit(-1);
             }
-            return *static_cast<T>(data[col2ind[colName]]);
+            return *static_cast<T*>(data[rcol2ind[colName]]);
         }
 
         void*& operator[](ssize_t ind) {
@@ -31,7 +31,7 @@ struct TableView {
         }
 
         private:
-            std::map<std::string_view, ssize_t>& col2ind;
+            std::map<std::string, ssize_t> rcol2ind;
             std::vector<void*> data;
     };
 
@@ -66,9 +66,9 @@ struct TableView {
 
     public:
     
-    TableView(std::map<std::string_view, ssize_t>& col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_)  {}
+    TableView(std::map<std::string, ssize_t> col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_)  {}
 
-    std::map<std::string_view, ssize_t>& col2ind;
+    std::map<std::string, ssize_t> col2ind;
     std::vector<Row> columns;
 
     Iterator begin() {
@@ -125,11 +125,11 @@ public:
         columns.emplace_back(newCol);
     }
 
-    void Insert(std::vector<Value>& values) {
+    void Insert(const std::vector<Value>& values) {
         bool listType = false;
         bool mapType = false;
 
-        std::vector<int> setted(columns.size());
+        std::vector<int> setted(columns.size(), -1);
         for (int i = 0; i < values.size(); i++) {
             const auto& value = values[i];
 
@@ -161,12 +161,18 @@ public:
                 // throw ex - should be one per each col
                 throw std::runtime_error("error");
             }
-            std::iota(setted.begin(), setted.end(), 0);
+            for (int i = 0; i < values.size(); i++) {
+                if (values[i].fValue.get()->getType() != Type::Empty) {
+                    setted[i] = i;
+                }
+            }
+            //std::iota(setted.begin(), setted.end(), 0);
         }
 
         for (int i = 0; i < columns.size(); i++) {
             if (setted[i] == -1) {
                 columns[i]->push(); // will throw ex form inside if no default
+                continue;
             }
 
             columns[i]->push(values[setted[i]].fValue);
@@ -185,9 +191,9 @@ public:
                 throw std::runtime_error("error");
                 exit(-1);
             }
-            if (tc.table == "") {
+            /*if (tc.table == "") {
                 tc.table = tName;
-            }
+            }*/ // not try to set table to have simular "" in both leaf cond and need tablecolumn
         }
         return true;
     }
@@ -199,6 +205,7 @@ public:
         }
         std::map<TableColumn, std::shared_ptr<DbType>> vals;
 
+        isFine.resize(columns[0]->size());
         ssize_t fineAmt = 0;
         bool gotFineInds = false;
         // and are there wait to write base loop
@@ -216,6 +223,7 @@ public:
             isFine[ind] = getValue<DbBool, bool>(res);
             fineAmt += isFine[ind];
         }
+        return fineAmt;
     }
 
     void Update(parser::Assignments& as, parser::Condition& condWh) {
@@ -258,7 +266,7 @@ public:
                 continue;
             }
             colAmt++;
-            if (name2Ind.find(tc.column) != name2Ind.end()) {
+            if (name2Ind.find(tc.column) == name2Ind.end()) {
                 // throw ex not found column in table
                 throw std::runtime_error("error");
                 exit(-1);
@@ -290,7 +298,7 @@ public:
 private:
     std::string tName;
     std::vector<std::shared_ptr<Column>> columns;
-    std::map<std::string_view, ssize_t> name2Ind;
+    std::map<std::string, ssize_t> name2Ind;
 };
 
 }

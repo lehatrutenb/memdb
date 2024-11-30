@@ -126,7 +126,6 @@ public:
             // throw ex - bad op
             throw std::runtime_error("error");
             exit(-1);
-            break;
         }
         return false;
     }
@@ -150,9 +149,25 @@ public:
     }
 
     bool doOp(Operation op, const DbBool* another) { // update cur
-        // throw err
-        throw std::runtime_error("error");
-        exit(-1);
+        switch (op) {
+        case Operation::EQ:
+            return x == another->x;
+        case Operation::NOTEQ:
+            return x != another->x;
+        case Operation::AND:
+            return x && another->x;
+        case Operation::OR:
+            return x || another->x;
+        case Operation::NOT:
+            throw std::runtime_error("error UNIMPLEMENTED"); // TODO
+            exit(-1);
+        case Operation::XOR:
+            return (x ^ another->x);
+        default:
+            // throw ex - bad op
+            throw std::runtime_error("error");
+            exit(-1);
+        }
         return true;
     }
 
@@ -175,10 +190,17 @@ public:
     }
 
     bool doOp(Operation op, const DbBytes* another) { // update cur
-        // throw err
-        throw std::runtime_error("error");
-        exit(-1);
-        return true;
+        switch (op) {
+        case Operation::EQ:
+            return x == another->x;
+        case Operation::NOTEQ:
+            return x != another->x;
+        default:
+            // throw ex - bad op
+            throw std::runtime_error("error");
+            exit(-1);
+        }
+        return 1;
     }
 
     std::vector<char> x;
@@ -199,11 +221,23 @@ public:
         return copy;
     }
 
-    bool doOp(Operation op, const DbString* another) { // update cur
-        // throw err
-        throw std::runtime_error("error");
-        exit(-1);
-        return true;
+    int doOp(Operation op, const DbString* another) { // update cur
+        switch (op) {
+        case Operation::EQ:
+            return x == another->x;
+        case Operation::NOTEQ:
+            return x != another->x;
+        case Operation::PLUS:
+            x += another->x;
+            return 1;
+        case Operation::LEN:
+            return x.size();
+        default:
+            // throw ex - bad op
+            throw std::runtime_error("error");
+            exit(-1);
+        }
+        return 1;
     }
 
     std::string x;
@@ -329,6 +363,14 @@ public:
         }
     }
 
+    ssize_t getLastInd() {
+        if (fl.empty()) {
+            return -1;
+        } else {
+            return *fl.begin();
+        }
+    }
+
     void update(ssize_t ind, T& obj) {
         // throw ex if not exist
         if (v.find(ind) == v.end()) {
@@ -337,7 +379,7 @@ public:
         v[ind] = obj;
     }
 
-    int push(T& obj) {
+    ssize_t push(T& obj) {
         v[++sz] = obj;
         fl.push_front(sz); // push front is fine cause location principe
         ind2it[sz - 1] = fl.begin();

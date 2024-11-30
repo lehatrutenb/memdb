@@ -23,6 +23,10 @@
 11. разрешено писать select col1 from table1 where ... вместо select table1.col1 from table1 where если табличка всего одна
 12. не очень понял почему в тестовых запросов опускали запятую в конце хотя в усл сказанно,что если не пишут поле, то хотя бы запятую оставляют - добавил
 1. разрешить использовать оба типа при insert одновременно
+
+TODO autoincrement - check that type ios int
+add work with attrs
+how not opperation will work? - test
 */
 
 namespace memdb {
@@ -63,19 +67,28 @@ public:
         tables[tName2ind[tName]].Update(dataToUpdate, condition);
     }
 
-    std::optional<TableView> Select(const std::vector<TableColumn>& tcs, parser::Condition& condWh, std::string& tableName) { // if want to select from multiply tables - add code here not in tables - just merge them
+    std::optional<TableView> Select(std::vector<TableColumn>& tcs, parser::Condition& condWh, std::string& tableName) { // if want to select from multiply tables - add code here not in tables - just merge them
         if (tcs.empty()) {
             return {};
         }
         if (tableName == "" && tables.size() == 1) { // if single table in db can not to write it
             tableName = tName2ind.begin()->first;
         }
-        if (tName2ind.find(tcs[0].table) == tName2ind.end()) {
+        for (auto& tc: tcs) { // try to push table name
+            if (tc.table == "") {
+                tc.table = tableName;
+            }
+        }
+        if (tName2ind.find(tableName) == tName2ind.end()) {//)tName2ind.find(tcs[0].table) == tName2ind.end()) {
             // throw ex table not found
             throw std::runtime_error("error");
             exit(-1);
         }
-        return tables[tName2ind[tcs[0].table]].Select(tcs, condWh);
+
+        for (auto row: tables[tName2ind[tableName]].Select(tcs, condWh)) {
+            std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+        }
+        return std::optional<TableView>{tables[tName2ind[tableName]].Select(tcs, condWh)};
     }
 
     std::optional<TableView> Execute(const std::string_view& request) { // not void
@@ -199,12 +212,23 @@ int main() {
     Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
     std::string_view req2 = R"(insert (,"vasya", 0xdeadbeefdeadbeef,) to users)";
-    std::string_view req3 = R"(insert (login = "vasya", password_hash = 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req3 = R"(insert (login = "vasya", password_hash = 0xdeadbeefdeadbeef) to users)";
     std::string_view req4 = R"(insert (,"admin", 0x0000000000000000, true) to users)";
+    std::string_view req5 = R"(select id, login from users where is_admin)";
+    std::string_view req6 = R"(select id, login from users where is_admin || id < 10)";
 
     db.Execute(req1);
     db.Execute(req2);
+    db.Execute(req3);
+    db.Execute(req4);
+    db.Execute(req5);
+    for (auto row: db.Execute(req5).value()) {
+        //std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
+    }
+    
     int x;
+    x = 1;
+
     /*const std::string_view tName = "table1";
     std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
     std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};

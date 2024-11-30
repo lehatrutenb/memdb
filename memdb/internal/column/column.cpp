@@ -70,6 +70,7 @@ public:
         return name;
     }
 
+    virtual ssize_t size() = 0;
     virtual DbType_s<int32_t>::FLIt begin() = 0; // type there doesn't really matter
     virtual DbType_s<int32_t>::FLIt end() = 0;
 private:
@@ -77,9 +78,12 @@ private:
     int rowTypeF = 0;
 };
 
+struct ColumnInt32;
+
 template<typename T, typename DbT>
 class ColumnBase : public Column {
 public:
+friend ColumnInt32;
     ColumnBase(ColumnDescription descr) : Column(descr.tps, descr.name) {
         if (descr.defVal.get()->getType() == Type::Empty) {
             defVal = {};
@@ -89,11 +93,14 @@ public:
     }
     
     ssize_t push(std::shared_ptr<DbType> x) override {
+        if (x->getType() == Type::Empty) { // not obligitary (cause checks in insert) but let it be
+            return push();
+        }
         T x_ = dynamic_cast<DbT*>(x.get())->get();
         return cur.push(x_);
     }
 
-    ssize_t push() override {
+    virtual ssize_t push() override {
         if (defVal.has_value()) {
             return cur.push(defVal.value());
         }
@@ -135,13 +142,35 @@ public:
         return cur.end();
     }
 
+    ssize_t size()  override {
+        return cur.size();
+    }
+
 private:
-    DbType_s<T> cur = DbType_s<T>{};
     std::optional<T> defVal;
+    DbType_s<T> cur = DbType_s<T>{};
 };
 
 struct ColumnInt32 : public ColumnBase<int32_t, DbInt32> {
+    using baseColT = ColumnBase<int32_t, DbInt32>;
     ColumnInt32(const ColumnDescription& descr) : ColumnBase<int32_t, DbInt32>(descr) {}
+    virtual ssize_t push() override {
+        if (baseColT::defVal.has_value()) {
+            auto val = defVal.value();
+            return baseColT::cur.push(val);
+        }
+        if (Autoincrement()) {
+            if (baseColT::cur.getLastInd() == -1) {
+                int val = 0;
+                return baseColT::cur.push(val);
+            }
+            auto val = baseColT::get(baseColT::cur.getLastInd()) + 1;
+            return baseColT::cur.push(val);
+        }
+        // throw ex
+        throw std::runtime_error("error");
+        return -1;
+    }
 };
 
 struct ColumnBool : public ColumnBase<bool, DbBool> {
