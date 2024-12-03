@@ -1,8 +1,8 @@
 #pragma once
 #include <string_view>
 #include <map>
-#include "../table/table.cpp"
-#include "../parser/parser.cpp"
+#include "../table/table.hpp"
+#include "../parser/parser.hpp"
 #include <stdexcept>
 
 /*

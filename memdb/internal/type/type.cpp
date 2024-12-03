@@ -7,35 +7,9 @@
 #include <memory>
 #include <stdexcept>
 #include <iostream>
+#include "type.hpp"
 
 namespace memdb {
-
-enum class Type {
-    Int32,
-    Bool,
-    Bytes,
-    String,
-    Empty,
-};
-
-enum class Operation {
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    MOD,
-    EQ,
-    LESS,
-    MORE,
-    EQLESS,
-    EQMORE,
-    NOTEQ,
-    AND,
-    OR,
-    NOT,
-    XOR,
-    LEN
-};
 
 bool IsBoolOp(Operation op) {
     static std::vector<Operation> bOps = {Operation::AND, Operation::OR, Operation::NOT, Operation::XOR};
@@ -57,196 +31,175 @@ bool IsNonDefCmpOp(Operation op) {
     return (std::find(cOps.begin(), cOps.end(), op) != cOps.end());
 }
 
-// TODO можно сделать класс не виртуальным чтобы не создавать лишний раз vtable
 
-class DbType {
-public:
-    virtual Type getType()=0;
-    virtual std::shared_ptr<DbType> Copy()=0;
-    virtual ~DbType()=default;
-};
+Type DbTypeEmpty::getType() {
+    return Type::Empty;
+}
+std::shared_ptr<DbType> DbTypeEmpty::Copy() {};
 
-class DbTypeEmpty : public DbType {
-    public:
-    Type getType() override {
-        return Type::Empty;
-    }
-    std::shared_ptr<DbType> Copy() override {};
-};
 
-class DbInt32 : public DbType {
-public:
-    DbInt32(int x_) : x(x_){};
-    Type getType() override {
-        return Type::Int32;
-    }
-    int32_t get() {
-        return x;
-    }
 
-    std::shared_ptr<DbType> Copy() override {
-        std::shared_ptr<DbType> copy{new DbInt32(x)};
-        return copy;
-    }
+DbInt32::DbInt32(int x_) : x(x_){};
+Type DbInt32::getType() {
+    return Type::Int32;
+}
+int32_t DbInt32::get() {
+    return x;
+}
 
-    bool doOp(Operation op, const DbInt32* another) { // update cur
-        switch (op)
-        {
-        case Operation::PLUS:
-            x += another->x;
-            break;
-        case Operation::MINUS:
-            x -= another->x;
-            break;
-        case Operation::MULTIPLY:
-            x *= another->x;
-            break;
-        case Operation::DIVIDE:
-            if (another->x == 0) {
-                // throw ex divide by 0
-                throw std::runtime_error("error");
-                exit(-1);
-            }
-            x /= another->x;
-            break;
-        case Operation::MOD:
+std::shared_ptr<DbType> DbInt32::Copy() {
+    std::shared_ptr<DbType> copy{new DbInt32(x)};
+    return copy;
+}
+
+bool DbInt32::doOp(Operation op, const DbInt32* another) { // update cur
+    switch (op)
+    {
+    case Operation::PLUS:
+        x += another->x;
+        break;
+    case Operation::MINUS:
+        x -= another->x;
+        break;
+    case Operation::MULTIPLY:
+        x *= another->x;
+        break;
+    case Operation::DIVIDE:
         if (another->x == 0) {
-                // throw ex MOD 0
-                throw std::runtime_error("error");
-                exit(-1);
-            }
-            x %= another->x;
-            break;
-        case Operation::LESS:
-            return (x < another->x);
-            break;
-        case Operation::MORE:
-            return (x > another->x);
-            break;
-        default:
-            // throw ex - bad op
+            // throw ex divide by 0
             throw std::runtime_error("error");
             exit(-1);
         }
-        return false;
-    }
-
-    int32_t x;
-};
-
-class DbBool : public DbType {
-public:
-    DbBool(bool x_) : x(x_){};
-    Type getType() override {
-        return Type::Bool;
-    }
-    bool get() {
-        return x;
-    }
-
-    std::shared_ptr<DbType> Copy() override {
-        std::shared_ptr<DbType> copy{new DbBool(x)};
-        return copy;
-    }
-
-    bool doOp(Operation op, const DbBool* another) { // update cur
-        switch (op) {
-        case Operation::EQ:
-            return x == another->x;
-        case Operation::NOTEQ:
-            return x != another->x;
-        case Operation::AND:
-            return x && another->x;
-        case Operation::OR:
-            return x || another->x;
-        case Operation::NOT:
-            throw std::runtime_error("error UNIMPLEMENTED"); // TODO
-            exit(-1);
-        case Operation::XOR:
-            return (x ^ another->x);
-        default:
-            // throw ex - bad op
+        x /= another->x;
+        break;
+    case Operation::MOD:
+    if (another->x == 0) {
+            // throw ex MOD 0
             throw std::runtime_error("error");
             exit(-1);
         }
-        return true;
+        x %= another->x;
+        break;
+    case Operation::LESS:
+        return (x < another->x);
+        break;
+    case Operation::MORE:
+        return (x > another->x);
+        break;
+    default:
+        // throw ex - bad op
+        throw std::runtime_error("error");
+        exit(-1);
     }
+    return false;
+}
 
-    bool x;
-};
 
-class DbBytes : public DbType {
-public:
-    DbBytes(std::vector<char> v_) : x(v_){};
-    std::vector<char> get() {
-        return x;
+
+DbBool::DbBool(bool x_) : x(x_){};
+Type DbBool::getType() {
+    return Type::Bool;
+}
+bool DbBool::get() {
+    return x;
+}
+
+std::shared_ptr<DbType> DbBool::Copy() {
+    std::shared_ptr<DbType> copy{new DbBool(x)};
+    return copy;
+}
+
+bool DbBool::doOp(Operation op, const DbBool* another) { // update cur
+    switch (op) {
+    case Operation::EQ:
+        return x == another->x;
+    case Operation::NOTEQ:
+        return x != another->x;
+    case Operation::AND:
+        return x && another->x;
+    case Operation::OR:
+        return x || another->x;
+    case Operation::NOT:
+        throw std::runtime_error("error UNIMPLEMENTED"); // TODO
+        exit(-1);
+    case Operation::XOR:
+        return (x ^ another->x);
+    default:
+        // throw ex - bad op
+        throw std::runtime_error("error");
+        exit(-1);
     }
-    Type getType() override {
-        return Type::Bytes;
-    }
+    return true;
+}
 
-    std::shared_ptr<DbType> Copy() override {
-        std::shared_ptr<DbType> copy{new DbBytes(x)};
-        return copy;
-    }
 
-    bool doOp(Operation op, const DbBytes* another) { // update cur
-        switch (op) {
-        case Operation::EQ:
-            return x == another->x;
-        case Operation::NOTEQ:
-            return x != another->x;
-        default:
-            // throw ex - bad op
-            throw std::runtime_error("error");
-            exit(-1);
-        }
+
+DbBytes::DbBytes(std::vector<char> v_) : x(v_){};
+std::vector<char> DbBytes::get() {
+    return x;
+}
+Type DbBytes::getType() {
+    return Type::Bytes;
+}
+
+std::shared_ptr<DbType> DbBytes::Copy() {
+    std::shared_ptr<DbType> copy{new DbBytes(x)};
+    return copy;
+}
+
+bool DbBytes::doOp(Operation op, const DbBytes* another) { // update cur
+    switch (op) {
+    case Operation::EQ:
+        return x == another->x;
+    case Operation::NOTEQ:
+        return x != another->x;
+    default:
+        // throw ex - bad op
+        throw std::runtime_error("error");
+        exit(-1);
+    }
+    return 1;
+}
+
+
+
+
+DbString::DbString(std::string s_) : x(s_){};
+std::string DbString::get() {
+    return x;
+}
+Type DbString::getType() {
+    return Type::String;
+}
+
+std::shared_ptr<DbType> DbString::Copy() {
+    std::shared_ptr<DbType> copy{new DbString(x)};
+    return copy;
+}
+
+int DbString::doOp(Operation op, const DbString* another) { // update cur
+    switch (op) {
+    case Operation::EQ:
+        return x == another->x;
+    case Operation::NOTEQ:
+        return x != another->x;
+    case Operation::PLUS:
+        x += another->x;
         return 1;
+    case Operation::LEN:
+        return x.size();
+    default:
+        // throw ex - bad op
+        throw std::runtime_error("error");
+        exit(-1);
     }
-
-    std::vector<char> x;
-};
-
-class DbString : public DbType {
-public:
-    DbString(std::string s_) : x(s_){};
-    std::string get() {
-        return x;
-    }
-    Type getType() override {
-        return Type::String;
-    }
-
-    std::shared_ptr<DbType> Copy() override {
-        std::shared_ptr<DbType> copy{new DbString(x)};
-        return copy;
-    }
-
-    int doOp(Operation op, const DbString* another) { // update cur
-        switch (op) {
-        case Operation::EQ:
-            return x == another->x;
-        case Operation::NOTEQ:
-            return x != another->x;
-        case Operation::PLUS:
-            x += another->x;
-            return 1;
-        case Operation::LEN:
-            return x.size();
-        default:
-            // throw ex - bad op
-            throw std::runtime_error("error");
-            exit(-1);
-        }
-        return 1;
-    }
-
-    std::string x;
-};
+    return 1;
+}
 
 
 
-static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> right) {
+
+int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> right) {
     if (left->getType() != right->getType()) {
         // throw ex - types must be eq
         throw std::runtime_error("error");
@@ -296,217 +249,20 @@ static int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbTy
     }
 }
 
-/*
-template<typename T>
-class DbTypeMassoP {
-    virtual void get(std::vector<ssize_t> inds, std::vector<T>& res) = 0;
-    virtual void get(std::vector<bool>& is_fine, std::vector<T>& res) = 0;
-    virtual void getIndsWhere(std::vector<ssize_t>& inds, std::vector<std::function<bool(T&)>>& to_check) = 0;
-    virtual void getValsWhere(std::vector<ssize_t>& inds, std::vector<std::function<bool(T&)>>& to_check, std::vector<T>& res) = 0;
-    virtual void del(std::vector<ssize_t> inds) = 0;
-    virtual void delWhere(std::vector<ssize_t>& inds, std::vector<std::function<bool(T&)>>& to_check) = 0;
-};*/
 
-// vector - хорошо, если говорить в том контексте, что мы удаляем не 1 конкретный элемент, а какое-то ощутимое множетсво
-// unordered_map  - аналог, но для более точечных удалений + хуже работает когда очень много элементов 
 
-template<typename T>
-class DbType_s { //: public DbTypeMassoP<T> {
-public:
-    T get(ssize_t ind) {
-        // throw ex if not exist
-        if (v.find(ind) == v.end()) {
-            throw std::runtime_error("error");
-        }
-        return v[ind];
+TableColumn::TableColumn(std::string table_, std::string column_) : table(table_), column(column_){}; // not add 1 arg not to create misunderstandings
+TableColumn::TableColumn(std::pair<std::string, std::string> tc) : table(tc.first), column(tc.second){};
+bool TableColumn::operator<(const TableColumn& other) const {
+    if (table != other.table) {
+        return table < other.table;
     }
-
-    void* getp(ssize_t ind) {
-        // throw ex if not exist
-        if (v.find(ind) == v.end()) {
-            throw std::runtime_error("error");
-        }
-        return static_cast<void*>(&v[ind]);
-    }
-
-    void get(std::vector<ssize_t> inds, std::vector<T>& res) {
-        res.reserve(inds.size());
-        for (ssize_t i : inds) {
-             // throw ex if not exist
-            if (v.find(i) == v.end()) {
-                throw std::runtime_error("error");
-            }
-            res.emplace_back(v[i]);
-        }
-    }
-
-    void get(std::vector<bool>& is_fine, std::vector<T>& res) {
-        for (int i = 0; i < sz; i++) {
-            if (is_fine[i]) {
-                // throw ex if not exist
-                if (v.find(i) == v.end()) {
-                    throw std::runtime_error("error");
-                }
-                res.emplace_back(v[i]);
-            }
-        }
-    }
-
-    void get(std::vector<bool>& is_fine, std::vector<void*>& res) {
-        for (int i = 0; i < sz; i++) {
-            if (is_fine[i]) {
-                // throw ex if not exist
-                if (v.find(i) == v.end()) {
-                    throw std::runtime_error("error");
-                }
-                res.emplace_back(static_cast<void*>(&v[i]));
-            }
-        }
-    }
-
-    ssize_t getLastInd() {
-        if (fl.empty()) {
-            return -1;
-        } else {
-            return *fl.begin();
-        }
-    }
-
-    void update(ssize_t ind, T& obj) {
-        // throw ex if not exist
-        if (v.find(ind) == v.end()) {
-            throw std::runtime_error("error");
-        }
-        v[ind] = obj;
-    }
-
-    ssize_t push(T& obj) {
-        v[++sz] = obj;
-        fl.push_front(sz); // push front is fine cause location principe
-        ind2it[sz - 1] = fl.begin();
-        ind2it[sz] = fl.before_begin();
-
-        return sz;
-    }
-
-    void del(int ind) {
-        // throw ex if not exist
-        if (v.find(ind) == v.end()) {
-            throw std::runtime_error("error");
-        }
-        v.erase(ind);
-        auto it_prev = fl.before_begin();
-        auto it_nx = fl.begin();
-        while (*it_nx != ind) {
-            it_prev++;
-            it_nx++;
-        }
-        fl.erase_after(it_prev);
-        //fl.erase_after(ind2it[ind]);
-        ind2it.erase(ind);
-    }
-
-    void del(std::vector<ssize_t> inds) {
-        for (ssize_t i : inds) {
-            del(i);
-        }
-    }
-
-    // точно ли тут хотим индексы передавать а не просто идти по всем элементам?
-    /*void delWhere(std::vector<ssize_t>& inds, std::vector<std::function<bool(T&)>>& to_check) { // function<void(void)>  std::vector<bool check(T& arg)>
-        for (ssize_t i : inds) {
-            bool ok = true;
-            for (auto f_check : to_check) {
-                ok &= f_check(v[i]);
-                /*if (!ok) {
-                    break;
-                }* / // TODO check if really helps
-            }
-            if (ok) {
-                del(i);
-            }
-        }
-    }*/
-
-    ssize_t size() {
-        return sz;
-    }
-
-    void getInds(std::vector<ssize_t>& res) {
-        for (auto ind : fl) {
-            res.push_back(ind);
-        }
-    }
-
-    using FLIt = std::forward_list<ssize_t>::iterator;
-    FLIt begin() {
-        return fl.begin();
-    }
-
-    FLIt end() {
-        return fl.end();
-    }
-
-    ~DbType_s() = default;
-
-private:
-    std::unordered_map<ssize_t, T> v;
-    std::forward_list<ssize_t> fl;
-    std::unordered_map<ssize_t, FLIt> ind2it; // cmps it to el before
-    ssize_t sz;
-};
-
-struct TableColumn {
-public:
-    TableColumn(std::string table_, std::string column_) : table(table_), column(column_){}; // not add 1 arg not to create misunderstandings
-    TableColumn(std::pair<std::string, std::string> tc) : table(tc.first), column(tc.second){};
-    std::string table;
-    std::string column;
-
-    bool operator<(const TableColumn& other) const {
-        if (table != other.table) {
-            return table < other.table;
-        }
-        return column < other.column;
-    }
-
-    bool operator==(const TableColumn& other) const {
-        return table == other.table && column == other.column;
-    }
-};
-
-template<typename T, typename U>
-U getValue(std::shared_ptr<DbType> x) {
-    return dynamic_cast<T*>(x.get())->x;
+    return column < other.column;
 }
 
+bool TableColumn::operator==(const TableColumn& other) const {
+    return table == other.table && column == other.column;
 }
 
-/*
-int main() {
-    memdb::DbType_s<std::string> test{};
-    test.begin();
-}*/
 
-
-/*
-class DbType_s {
-public:
-    virtual void get(int ind) = 0;
-    virtual void update(int ind, DbType) = 0;
-    virtual void push(int ind) = 0;
-    virtual ~DbType_s() = 0;
-};
-
-class Int32_s : DbType_s {
-};
-
-class Bool_s : DbType_s {
-};
-
-class Bytes_s : DbType_s {
-};
-
-class String_s : DbType_s {
-};
-*/
+}

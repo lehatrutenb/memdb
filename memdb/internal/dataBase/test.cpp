@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-#include "../../internal/dataBase/db.cpp"
+#include "../../internal/dataBase/db.hpp"
 
 using namespace memdb;
 

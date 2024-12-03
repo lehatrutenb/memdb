@@ -5,96 +5,10 @@
 #include <map>
 #include <memory>
 #include <cctype>
-#include "../type/type.cpp"
-#include "../column/column.cpp"
+#include "lexer.hpp"
 
 namespace memdb {
-
 namespace lexer {
-    enum class Command {
-        CREATE,
-        INSERT,
-        SELECT,
-        UPDATE,
-        DELETE,
-        JOIN
-    };
-
-    enum class SubCommand {
-        WHERE,
-        ON,
-        SET,
-        FROM,
-        INDEX,
-        TABLE,
-        TO,
-        BY
-    };
-
-    enum class Attribute {
-        UNIQUE = 1,
-        AUTOINCREMENT = 2,
-        KEY = 4,
-        ORDERED,
-        UNORDERED
-    };
-
-    enum class Bracket {
-        CIRCLEO,
-        CIRCLEC,
-        FIGUREO,
-        FIGUREC,
-        LENO,
-        LENC,
-        RECTO,
-        RECTC,
-    };
-
-    enum class Other {
-        TWOPOINT,
-        COMMA
-    };
-
-   /*enum class ColumnType {
-        INT32,
-        BOOL,
-        BYTES,
-        STRING
-    };*/
-
-    std::map<std::string_view, Command> s2c = {
-        {"create", Command::CREATE}, {"insert", Command::INSERT}, {"select", Command::SELECT}, {"update", Command::UPDATE}, {"delete", Command::DELETE}, 
-        {"join", Command::JOIN}
-    };
-
-    std::map<std::string_view, SubCommand> s2sc = {
-        {"where", SubCommand::WHERE}, {"on", SubCommand::ON}, {"set", SubCommand::SET}, {"from", SubCommand::FROM}, {"index", SubCommand::INDEX}, {"table", SubCommand::TABLE}, {"to", SubCommand::TO}, {"to", SubCommand::BY}
-    };
-
-    std::map<std::string_view, Attribute> s2a = {
-        {"unique", Attribute::UNIQUE}, {"autoincrement", Attribute::AUTOINCREMENT}, {"key", Attribute::KEY}, {"ordered", Attribute::ORDERED},
-        {"unordered", Attribute::UNORDERED}
-    };
-
-    // CARE | IS NOT REALLY OPERATION CURRENTLY TODO
-    std::map<std::string_view, Operation> s2op = {
-        {"+", Operation::PLUS}, {"-", Operation::MINUS}, {"*", Operation::MULTIPLY}, {"/", Operation::DIVIDE}, {"%", Operation::MOD}, {"=", Operation::EQ}, 
-        {"<", Operation::LESS}, {">", Operation::MORE}, {"<=", Operation::EQLESS}, {">=", Operation::EQMORE}, {"!=", Operation::NOTEQ}, {"&&", Operation::AND}, 
-        {"||", Operation::OR}, {"!", Operation::NOT}, {"^^", Operation::XOR}, {"|", Operation::LEN}
-    };
-
-    std::map<std::string_view, Bracket> s2br = {
-        {"(", Bracket::CIRCLEO}, {")", Bracket::CIRCLEC}, {"|{", Bracket::LENO}, {"}|", Bracket::LENC}, {"{", Bracket::FIGUREO}, {"}", Bracket::FIGUREC}, {"[", Bracket::RECTO}, {"]", Bracket::RECTC}, 
-    };
-
-    std::map<std::string_view, Type> s2ct = {
-        {"int32", Type::Int32}, {"bool", Type::Bool}, {"string", Type::String}, {"bytes", Type::Bytes}, 
-    };
-
-    std::map<std::string_view, Other> s2oth = {
-        {":", Other::TWOPOINT}, {",", Other::COMMA},
-    };
-
     std::string AddSpace(const std::string_view& s, int& ind, bool& insideString, bool& insideLen) { // care - change index itself
         char ch = s[ind];
         std::string res;
@@ -237,294 +151,234 @@ namespace lexer {
     }
 }
 
-struct Tokenizer {
 
-enum class TokenT {
-    COMMAND,
-    SUBCOMMAND,
-    ATTRIBUTE,
-    OPERATION,
-    BRACKET,
-    COLUMNTYPE,
-    DBTYPE,
-    STRING,
-    OTHER,
-    CONDITION
-};
 
-struct Token {
-    virtual TokenT GetType() const = 0;
-    virtual std::shared_ptr<Token> Copy()=0;
-    virtual bool Parse(std::vector<std::string>& inp, int& ind) = 0;
-};
-
-template<typename T>
-static std::shared_ptr<Token> getSharedToken() {
-    std::shared_ptr<Token> res{new T{}};
-    return res;
+Tokenizer::CommandT::CommandT() {};
+Tokenizer::CommandT::CommandT(lexer::Command t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::CommandT::GetType() const {
+    return Tokenizer::TokenT::COMMAND;
 }
-
-template<typename T>
-static std::shared_ptr<Token> getSharedToken(T* val) {
-    std::shared_ptr<Token> res{val};
-    return res;
-}
-
-struct CommandT : public Token {
-    public:
-    CommandT() {};
-    CommandT(lexer::Command t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::COMMAND;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsCommand(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new CommandT(t)};
-        return copy;
-    }
-
-    lexer::Command t;
-};
-
-struct SubCommandT : public Token {
-    public:
-    SubCommandT(){};
-    SubCommandT(lexer::SubCommand t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::SUBCOMMAND;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsSubCommand(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new SubCommandT(t)};
-        return copy;
-    }
-
-    lexer::SubCommand t;
-};
-
-struct AttributeT : public Token {
-    public:
-    AttributeT(){};
-    AttributeT(lexer::Attribute t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::ATTRIBUTE;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsAttribute(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new AttributeT(t)};
-        return copy;
-    }
-
-    lexer::Attribute t;
-};
-
-struct OtherT : public Token {
-    public:
-    OtherT(){};
-    OtherT(lexer::Other t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::OTHER;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsOther(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new OtherT(t)};
-        return copy;
-    }
-
-    lexer::Other t;
-};
-
-
-struct OperationT : public Token {
-    public:
-    OperationT(){};
-    OperationT(Operation t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::OPERATION;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsOperation(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new OperationT(t)};
-        return copy;
-    }
-
-    Operation t;
-};
-
-struct BracketT : public Token {
-    public:
-    BracketT(){};
-    BracketT(lexer::Bracket t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::BRACKET;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsBracket(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new BracketT(t)};
-        return copy;
-    }
-
-    lexer::Bracket t;
-};
-
-struct ColumnTypeT : public Token {
-    public:
-    ColumnTypeT() : t(ColumnType{Type::Empty}){};
-    ColumnTypeT(ColumnType t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::COLUMNTYPE;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        auto res = lexer::IsColumnType(inp, ind);
-        if (res.first) {
-            t = res.second;
-            ind++;
-            if (t.t == Type::String || t.t == Type::Bytes) {
-                ind+=3;
-            }
-        }
-        return res.first;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new ColumnTypeT(t)};
-        return copy;
-    }
-
-    ColumnType t;
-};
-
-struct DBTypeT : public Token {
-    public:
-    DBTypeT(){};
-    DBTypeT(std::shared_ptr<DbType> t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::DBTYPE;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        {
-            auto res = lexer::IsString(inp, ind);
-            if (res.first) {
-                std::shared_ptr<DbType> tmp{new DbString(res.second)};
-                t.swap(tmp);
-                ind++;
-                return true;
-            }
-        }
-        {
-            auto res = lexer::IsBytes(inp, ind);
-            if (res.first) {
-                std::shared_ptr<DbType> tmp{new DbBytes(res.second)};
-                t.swap(tmp);
-                ind++;
-                return true;
-            }
-        }
-        {
-            auto res = lexer::IsInt(inp, ind);
-            if (res.first) {
-                std::shared_ptr<DbType> tmp{new DbInt32(res.second)};
-                t.swap(tmp);
-                ind++;
-                return true;
-            }
-        }
-        {
-            auto res = lexer::IsBool(inp, ind);
-            if (res.first) {
-                std::shared_ptr<DbType> tmp{new DbBool(res.second)};
-                t.swap(tmp);
-                ind++;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new DBTypeT(t)};
-        return copy;
-    }
-
-    std::shared_ptr<DbType> t;
-};
-
-struct StringT : public Token {
-    public:
-    StringT(){};
-    StringT(std::string t_) : t(t_){};
-    TokenT GetType() const override {
-        return TokenT::STRING;
-    }
-    bool Parse(std::vector<std::string>& inp, int& ind) override {
-        t = inp[ind];
+bool Tokenizer::CommandT::Parse(std::vector<std::string>& inp, int& ind) {
+    auto res = lexer::IsCommand(inp, ind);
+    if (res.first) {
+        t = res.second;
         ind++;
-        return true;
     }
+    return res.first;
+}
 
-    std::shared_ptr<Token> Copy() override {
-        std::shared_ptr<Token> copy{new StringT(t)};
-        return copy;
+std::shared_ptr<Tokenizer::Token> Tokenizer::CommandT::Copy() {
+    std::shared_ptr<Token> copy{new CommandT(t)};
+    return copy;
+}
+
+
+Tokenizer::SubCommandT::SubCommandT(){};
+Tokenizer::SubCommandT::SubCommandT(lexer::SubCommand t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::SubCommandT::GetType() const {
+    return Tokenizer::TokenT::SUBCOMMAND;
+}
+bool Tokenizer::SubCommandT::Parse(std::vector<std::string>& inp, int& ind) {
+    auto res = lexer::IsSubCommand(inp, ind);
+    if (res.first) {
+        t = res.second;
+        ind++;
     }
+    return res.first;
+}
 
-    std::string t;
-};
+std::shared_ptr<Tokenizer::Token> Tokenizer::SubCommandT::Copy() {
+    std::shared_ptr<Token> copy{new SubCommandT(t)};
+    return copy;
+}
 
-std::vector<std::shared_ptr<Token>> tokenSeq = {getSharedToken<CommandT>(), getSharedToken<SubCommandT>(), getSharedToken<AttributeT>(),
-            getSharedToken<OperationT>(), getSharedToken<BracketT>(), getSharedToken<ColumnTypeT>(), getSharedToken<DBTypeT>(), getSharedToken<OtherT>(), getSharedToken<StringT>()};
 
-std::vector<std::shared_ptr<Token>> Tokenize(std::vector<std::string> inp, int ind) {
-    std::vector<std::shared_ptr<Token>> tokens;
+
+
+Tokenizer::AttributeT::AttributeT(){};
+Tokenizer::AttributeT::AttributeT(lexer::Attribute t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::AttributeT::GetType() const {
+    return Tokenizer::TokenT::ATTRIBUTE;
+}
+bool Tokenizer::AttributeT::Parse(std::vector<std::string>& inp, int& ind) {
+    auto res = lexer::IsAttribute(inp, ind);
+    if (res.first) {
+        t = res.second;
+        ind++;
+    }
+    return res.first;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::AttributeT::Copy() {
+    std::shared_ptr<Token> copy{new AttributeT(t)};
+    return copy;
+}
+
+
+
+
+Tokenizer::OtherT::OtherT(){};
+Tokenizer::OtherT::OtherT(lexer::Other t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::OtherT::GetType() const  {
+    return Tokenizer::TokenT::OTHER;
+}
+bool Tokenizer::OtherT::Parse(std::vector<std::string>& inp, int& ind)  {
+    auto res = lexer::IsOther(inp, ind);
+    if (res.first) {
+        t = res.second;
+        ind++;
+    }
+    return res.first;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::OtherT::Copy()  {
+    std::shared_ptr<Token> copy{new OtherT(t)};
+    return copy;
+}
+
+
+
+Tokenizer::OperationT::OperationT(){};
+Tokenizer::OperationT::OperationT(Operation t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::OperationT::GetType() const  {
+    return Tokenizer::TokenT::OPERATION;
+}
+bool Tokenizer::OperationT::Parse(std::vector<std::string>& inp, int& ind)  {
+    auto res = lexer::IsOperation(inp, ind);
+    if (res.first) {
+        t = res.second;
+        ind++;
+    }
+    return res.first;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::OperationT::Copy()  {
+    std::shared_ptr<Token> copy{new OperationT(t)};
+    return copy;
+}
+
+
+
+
+Tokenizer::BracketT::BracketT(){};
+Tokenizer::BracketT::BracketT(lexer::Bracket t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::BracketT::GetType() const  {
+    return Tokenizer::TokenT::BRACKET;
+}
+bool Tokenizer::BracketT::Parse(std::vector<std::string>& inp, int& ind)  {
+    auto res = lexer::IsBracket(inp, ind);
+    if (res.first) {
+        t = res.second;
+        ind++;
+    }
+    return res.first;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::BracketT::Copy()  {
+    std::shared_ptr<Token> copy{new BracketT(t)};
+    return copy;
+}
+
+
+
+Tokenizer::ColumnTypeT::ColumnTypeT() : t(ColumnType{Type::Empty}){};
+Tokenizer::ColumnTypeT::ColumnTypeT(ColumnType t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::ColumnTypeT::GetType() const  {
+    return Tokenizer::TokenT::COLUMNTYPE;
+}
+bool Tokenizer::ColumnTypeT::Parse(std::vector<std::string>& inp, int& ind)  {
+    auto res = lexer::IsColumnType(inp, ind);
+    if (res.first) {
+        t = res.second;
+        ind++;
+        if (t.t == Type::String || t.t == Type::Bytes) {
+            ind+=3;
+        }
+    }
+    return res.first;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::ColumnTypeT::Copy()  {
+    std::shared_ptr<Token> copy{new ColumnTypeT(t)};
+    return copy;
+}
+
+
+
+
+Tokenizer::DBTypeT::DBTypeT(){};
+Tokenizer::DBTypeT::DBTypeT(std::shared_ptr<DbType> t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::DBTypeT::GetType() const  {
+    return Tokenizer::TokenT::DBTYPE;
+}
+bool Tokenizer::DBTypeT::Parse(std::vector<std::string>& inp, int& ind)  {
+    {
+        auto res = lexer::IsString(inp, ind);
+        if (res.first) {
+            std::shared_ptr<DbType> tmp{new DbString(res.second)};
+            t.swap(tmp);
+            ind++;
+            return true;
+        }
+    }
+    {
+        auto res = lexer::IsBytes(inp, ind);
+        if (res.first) {
+            std::shared_ptr<DbType> tmp{new DbBytes(res.second)};
+            t.swap(tmp);
+            ind++;
+            return true;
+        }
+    }
+    {
+        auto res = lexer::IsInt(inp, ind);
+        if (res.first) {
+            std::shared_ptr<DbType> tmp{new DbInt32(res.second)};
+            t.swap(tmp);
+            ind++;
+            return true;
+        }
+    }
+    {
+        auto res = lexer::IsBool(inp, ind);
+        if (res.first) {
+            std::shared_ptr<DbType> tmp{new DbBool(res.second)};
+            t.swap(tmp);
+            ind++;
+            return true;
+        }
+    }
+    return false;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::DBTypeT::Copy()  {
+    std::shared_ptr<Tokenizer::Token> copy{new DBTypeT(t)};
+    return copy;
+}
+
+
+
+Tokenizer::StringT::StringT(){};
+Tokenizer::StringT::StringT(std::string t_) : t(t_){};
+Tokenizer::TokenT Tokenizer::StringT::GetType() const  {
+    return Tokenizer::TokenT::STRING;
+}
+bool Tokenizer::StringT::Parse(std::vector<std::string>& inp, int& ind)  {
+    t = inp[ind];
+    ind++;
+    return true;
+}
+
+std::shared_ptr<Tokenizer::Token> Tokenizer::StringT::Copy()  {
+    std::shared_ptr<Token> copy{new StringT(t)};
+    return copy;
+}
+
+
+std::vector<std::shared_ptr<Tokenizer::Token>> Tokenizer::Tokenize(std::vector<std::string> inp, int ind) {
+    std::vector<std::shared_ptr<Tokenizer::Token>> tokens;
     while (ind < inp.size()) {
-        for (std::shared_ptr<Token> t : tokenSeq) { // don't already want copy? TODO check
+        for (std::shared_ptr<Tokenizer::Token> t : tokenSeq) { // don't already want copy? TODO check
             if (t->Parse(inp, ind)) {
                 tokens.push_back(t->Copy());
                 break;
@@ -534,24 +388,8 @@ std::vector<std::shared_ptr<Token>> Tokenize(std::vector<std::string> inp, int i
     return tokens;
 }
 
-};
 
 namespace parser {
-template<typename T, typename U>
-U getValue(std::shared_ptr<Tokenizer::Token> token) {
-    return dynamic_cast<T*>(token.get())->t;
-}
-
-
-template<typename T, typename U>
-int getNextToken(const std::vector<std::shared_ptr<Tokenizer::Token>>& ts, ssize_t ind, ssize_t r, Tokenizer::TokenT tokenTExp, U resExp) {
-    for (; ind <= r; ind++) {
-        if (ts[ind]->GetType() == tokenTExp && getValue<T, U>(ts[ind]) == resExp) {
-            return ind;
-        }
-    }
-    return -1;
-}
 
 std::pair<std::string, std::string> ParseTableColumn(const std::string& s) {
     ssize_t dotInd= 0;
@@ -567,52 +405,34 @@ std::pair<std::string, std::string> ParseTableColumn(const std::string& s) {
     return {"", s};
 }
 
-struct TokenStructure {
-    template<typename T>
-    struct ValueInd {
-        T val;
-        ssize_t ind;
-    };
-
-    std::vector<ValueInd<lexer::Command>> Commands;
-    std::vector<ValueInd<lexer::SubCommand>> SubCommands;
-    std::map<lexer::Command, ssize_t> C2i;
-    std::map<lexer::SubCommand, ssize_t> Sc2i;
-    std::vector<std::shared_ptr<Tokenizer::Token>> Tokens;
-
-    int getCmd(lexer::Command cmd) {
-        if (C2i.find(cmd) == C2i.end()) {
-            return -1;
-        }
-        return C2i[cmd];
+int TokenStructure::getCmd(lexer::Command cmd) {
+    if (C2i.find(cmd) == C2i.end()) {
+        return -1;
     }
-
-    int getScmd(lexer::SubCommand cmd) {
-        if (Sc2i.find(cmd) == Sc2i.end()) {
-            return -1;
-        }
-        return Sc2i[cmd];
-    }
-
-    TokenStructure(const std::vector<std::shared_ptr<Tokenizer::Token>>&& tokens, ssize_t l, ssize_t r) : Tokens(std::move(tokens)) {
-        for (int i = l; i <= r; ++i) {
-            if (Tokens[i]->GetType() == Tokenizer::TokenT::COMMAND) {
-                auto cmd = getValue<Tokenizer::CommandT, lexer::Command>(Tokens[i]);
-                Commands.push_back({cmd, i});
-                C2i[cmd] = i;
-            } else if (Tokens[i]->GetType() == Tokenizer::TokenT::SUBCOMMAND) {
-                auto subCmd = getValue<Tokenizer::SubCommandT, lexer::SubCommand>(Tokens[i]);
-                SubCommands.push_back({subCmd, i});
-                Sc2i[subCmd] = i;
-            }
-        }
-    }
-};
-}
+    return C2i[cmd];
 }
 
-/*#define COMMAND(name) {#name, Lexer::##name}
+int TokenStructure::getScmd(lexer::SubCommand cmd) {
+    if (Sc2i.find(cmd) == Sc2i.end()) {
+        return -1;
+    }
+    return Sc2i[cmd];
+}
+
+TokenStructure::TokenStructure(const std::vector<std::shared_ptr<Tokenizer::Token>>&& tokens, ssize_t l, ssize_t r) : Tokens(std::move(tokens)) {
+    for (int i = l; i <= r; ++i) {
+        if (Tokens[i]->GetType() == Tokenizer::TokenT::COMMAND) {
+            auto cmd = getValue<Tokenizer::CommandT, lexer::Command>(Tokens[i]);
+            Commands.push_back({cmd, i});
+            C2i[cmd] = i;
+        } else if (Tokens[i]->GetType() == Tokenizer::TokenT::SUBCOMMAND) {
+            auto subCmd = getValue<Tokenizer::SubCommandT, lexer::SubCommand>(Tokens[i]);
+            SubCommands.push_back({subCmd, i});
+            Sc2i[subCmd] = i;
+        }
+    }
+}
 
 
-COMMAND(ABA),
-COMMAND(ZZZ)*/
+}
+}
