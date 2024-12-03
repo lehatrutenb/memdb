@@ -129,15 +129,15 @@ class Parser {
 public:
     Parser() = default;
 
-    void parseSpaces(const std::string_view& s, int& ind);
+    void parseSpaces(const std::string_view& s, ssize_t& ind);
 
-    std::string parseWord(const std::string_view& s, int& ind);
+    std::string parseWord(const std::string_view& s, ssize_t& ind);
 
 
-    parser::TokenStructure Parse(const std::string_view& preS, int l, int r);
+    parser::TokenStructure Parse(const std::string_view& preS, ssize_t l, ssize_t r);
 
-    std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> ParseCreate(const std::string_view& preS, int l, int r);
-    std::pair<bool, std::pair<std::string, parser::InsertData>> ParseInsert(const std::string_view& preS, int l, int r);
+    //std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> ParseCreate(const std::string_view& preS, ssize_t l, ssize_t r);
+    //std::pair<bool, std::pair<std::string, parser::InsertData>> ParseInsert(const std::string_view& preS, ssize_t l, ssize_t r);
 };
 
 }

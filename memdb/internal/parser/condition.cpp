@@ -82,12 +82,12 @@ std::shared_ptr<DbType> Condition::Compute(std::map<TableColumn, std::shared_ptr
     }
 
     if (Op == Operation::LEN) {
-        if (rightCond) {
-            auto rightRes = rightCond->Compute(vals);
-            std::shared_ptr<DbType> resObj{new DbInt32(DoOp(Op, rightRes, rightRes))};
+        if (leftCond) {
+            auto leftRes = leftCond->Compute(vals);
+            std::shared_ptr<DbType> resObj{new DbInt32(DoOp(Op, leftRes, leftRes))};
             return resObj;
         } else {
-            // throw ex - 1 operand op
+            // throw ex - 1 operand op expected in left condition
             throw std::runtime_error("error");
             exit(-1);
         }
@@ -95,9 +95,15 @@ std::shared_ptr<DbType> Condition::Compute(std::map<TableColumn, std::shared_ptr
 
     if (IsBoolOp(Op)) {
         if (Op == Operation::NOT) {
-            auto rightRes = rightCond->Compute(vals);
-            std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, rightRes, rightRes))};
-            return resObj;
+            if (leftCond) {
+                auto leftRes = leftCond->Compute(vals);
+                std::shared_ptr<DbType> resObj{new DbBool(DoOp(Op, leftRes, leftRes))};
+                return resObj;
+            } else {
+                // throw ex - 1 operand op expected in left condition
+                throw std::runtime_error("error");
+                exit(-1);
+            }
         } else {
             if (!leftCond || !rightCond) {
                 // throw ex - 2 op op
@@ -227,7 +233,7 @@ Condition ConditionParser::Parse(const std::vector<std::shared_ptr<Tokenizer::To
             auto tp = dynamic_cast<const Tokenizer::BracketT*>(inp[i].get())->t;
             if (tp == lexer::Bracket::CIRCLEC || tp == lexer::Bracket::LENC) {
                 int left = static_cast<int>(curTokens.size()) - 1, right = left;
-                while (left >= l) {
+                while (left >= 0) {
                     if (curTokens[left]->GetType() == Tokenizer::TokenT::BRACKET) {
                         tp = dynamic_cast<const Tokenizer::BracketT*>(curTokens[left].get())->t;
                         if (tp == lexer::Bracket::CIRCLEO || tp == lexer::Bracket::LENO) {
@@ -236,7 +242,7 @@ Condition ConditionParser::Parse(const std::vector<std::shared_ptr<Tokenizer::To
                     }
                     left--;
                 }
-                if (left < l) {
+                if (left < 0) {
                     // throw ex - not found opend bracet for close one
                     throw std::runtime_error("error");
                     exit(-1);
@@ -270,6 +276,18 @@ Condition ConditionParser::Parse(const std::vector<std::shared_ptr<Tokenizer::To
                 if (cur->GetType() == Tokenizer::TokenT::OPERATION) {
                     Operation curOp = dynamic_cast<const Tokenizer::OperationT*>(curTokens[i].get())->t;
                     if (Condition::hasPrior(curOp, pr)) {
+                        if (curOp == Operation::NOT) {
+                            if (i + 1 >= curTokensNxt.size()) {
+                                // throw ex - not enough args per operation
+                                throw std::runtime_error("error");
+                                exit(-1);
+                            }
+                            curTokensNxt.emplace_back(curTokens[i + 1]);
+                            i++;
+                            Condition c = Parse(curTokensNxt, curTokensNxt.size() - 1, curTokensNxt.size() - 1);
+                            curTokensNxt.pop_back();
+                            curTokensNxt.emplace_back(Tokenizer::getSharedToken<ConditionT>(new ConditionT(Condition(curOp, std::make_shared<Condition>(c), {}))));
+                        }
                         if (i + 1 >= curTokens.size() || curTokensNxt.empty()) {
                             // throw ex - not enough args per operation
                             throw std::runtime_error("error");

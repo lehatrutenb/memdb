@@ -6,198 +6,168 @@
 #include <vector>
 #include <string>
 
-#include "../../internal/dataBase/db.hpp"
+//#include "../../internal/dataBase/db.hpp"
+#include "db.hpp"
+//#include "../../internal/parser/parser.hpp"
+//#include "../../internal/parser/lexer.hpp"
 
 using namespace memdb;
 
 TEST(CheckCreateTable, 0) {
     Database db;
-    const std::string_view tName = "table1";
+    std::string tName = "table1";
     std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
+    std::vector<ColumnFullDescription> colDescripts = {ColumnFullDescription(ColumnType(Type::Int32), ColumnDescription({ColumnAttrs::Default}, "column1"))};
+    db.CreateTable(tName, colDescripts);
 }
 
-TEST(CheckCreateManeTables, 1) {
+TEST(CheckCreateManyTables, 1) {
     Database db;
-    const std::string_view tName = "table1";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
+    std::string tName = "table1";
+    std::vector<ColumnFullDescription> colDescripts = {ColumnFullDescription(ColumnType(Type::Int32), ColumnDescription({ColumnAttrs::Default}, "column1"))};
+    db.CreateTable(tName, colDescripts);
 
-    const std::string_view tName = "table2";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
+    std::string tName2 = "table2";
+    std::vector<ColumnFullDescription> colDescripts2 = {ColumnFullDescription(ColumnType(Type::Bool), ColumnDescription({ColumnAttrs::Unique}, "column1"))};
+    db.CreateTable(tName2, colDescripts2);
 }
 
 
-TEST(CheckCreateTable, 2) {
+TEST(CheckCreateEmptyNameTable, 2) {
     Database db;
-    const std::string_view tName = "";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
+    std::string tName = "";
+    std::vector<ColumnFullDescription> colDescripts = {ColumnFullDescription(ColumnType(Type::Int32), ColumnDescription({ColumnAttrs::Default}, "column1"))};
+    db.CreateTable(tName, colDescripts);
 }
 
-TEST(CheckCreateColumn, 0) {
+//EXPECT_ANY_THROW(db.Insert("col_same", to_add));
+
+TEST(CheckCreateTable, 3) {
     Database db;
-    const std::string_view tName = "table1";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    std::shared_ptr<DbType> value{new DbInt32(123)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("column1", to_add);
-
-    std::shared_ptr<DbType> value{new DbInt32(321)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("column2", to_add);
+    std::string_view req = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
+    EXPECT_NO_THROW(db.Execute(req));
 }
 
-TEST(CheckCreateManeColumnsManyTables, 1) {
+TEST(CheckCreateTable, 4) {
     Database db;
-    const std::string_view tName = "table1";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    const std::string_view tName = "table2";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    std::shared_ptr<DbType> value{new DbInt32(123)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("column1", to_add);
-
-    std::shared_ptr<DbType> value{new DbInt32(321)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("column2", to_add);
+    std::string_view req = "create table users ({key, autoincrement, unique} id_#@. : int32, {} login: string[0], password_hash: bytes[100], { } is_admin: bool = false)";
+    EXPECT_NO_THROW(db.Execute(req));
 }
 
-
-TEST(CheckZeroNamedColumn, 3) {
+TEST(CheckCreateTable, 5) {
     Database db;
-    const std::string_view tName = "table";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    std::shared_ptr<DbType> value{new DbInt32(123)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("", to_add);
-
-    std::shared_ptr<DbType> value{new DbInt32(321)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("table1", to_add);
+    std::string_view req = R"(create table 1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwwertyuiopasdfghjklzxcvbnm@#$;_ ({key, autoincrement, unique} qwwertyuiopasdfghjklzxcvbnm@#$;_ : int32=12323, {} login:string[0]="aba!@#$%^&*{}[]',.;:=+-/\|", password_hash: bytes[100]=0xabcdef1234567890, { } is_admin: bool = false))";
+    EXPECT_NO_THROW(db.Execute(req));
 }
 
-TEST(CheckCreateTableSame, 4) {
+TEST(CheckCreateTable, 6) {
     Database db;
-    const std::string_view tName = "table_same";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    const std::string_view tName = "table_same";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    EXPECT_ANY_THROW(db.CreateTable(tName, colTps, colDescripts));
+    std::string_view req = R"(create table users ())";
+    EXPECT_NO_THROW(db.Execute(req));
 }
 
-TEST(CheckCreateColumnSame, 4) {
+TEST(CheckCreateTableBad, 0) {
     Database db;
-    const std::string_view tName = "table";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    std::shared_ptr<DbType> value{new DbInt32(123)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("col_same", to_add);
-
-    std::shared_ptr<DbType> value{new DbInt32(321)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    EXPECT_ANY_THROW(db.Insert("col_same", to_add));
+    std::string_view req = R"(create table users ({,} id : int32))";
+    EXPECT_ANY_THROW(db.Execute(req));
+    std::string_view req2 = R"(create table users ({} id : int))";
+    EXPECT_ANY_THROW(db.Execute(req2));
+    std::string_view req3 = R"(create table users ({} id : int32=""))";
+    EXPECT_ANY_THROW(db.Execute(req3));
 }
 
+TEST(SmokeCheckInsert, 0) {
+    Database db;
+    std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
+    std::string_view req2 = R"(insert (,"vasya", 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req3 = R"(insert (id=6,login = "vasya", password_hash = 0xdeadbeefdeadbeef, false) to users)";
+    std::string_view req4 = R"(insert (login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req5 = R"(insert (10,"admin", 0x0000000000000000, true) to users)";
 
-/*
-std::string runProgrammGetOutput(std::string code) {
-    std::ofstream file("input");
-    file << code;
-    file.close();
-    
-    std::ostringstream output;
-    auto cout_buff = std::cout.rdbuf();
-    std::cout.rdbuf(output.rdbuf());
-
-    emulator::Emulator emulator("./input");
-    emulator.run();
-
-    std::cout.rdbuf(cout_buff);
-
-    return output.str();
+    EXPECT_NO_THROW(db.Execute(req1));
+    EXPECT_NO_THROW(db.Execute(req2));
+    EXPECT_NO_THROW(db.Execute(req3));
+    EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
 }
 
+TEST(SmokeCheckInsert, 1) {
+    Database db;
+    std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
+    std::string_view req2 = R"(insert (,"", 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req3 = R"(insert (id=6,login = "12345678901234567890123456789012", password_hash = 0xded, false) to users)";
+    std::string_view req4 = R"(insert (login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req5 = R"(insert (10,"admin", 0x0000000000000000, true) to users)";
 
-TEST(CheckSmallProgramm, 0) {
-    EXPECT_EQ(runProgrammGetOutput("BEGIN PUSH 123 OUT END"), "123");
-    EXPECT_EQ(runProgrammGetOutput("BEGIN PUSH 123 POPR reg0 PUSHR reg0 PUSHR reg0 POP OUT END"), "123");
-    EXPECT_EQ(runProgrammGetOutput("BEGIN PUSH -123 PUSH 2 MUL OUT END"), "-246");
-    EXPECT_EQ(runProgrammGetOutput("BEGIN PUSH 2 PUSH 10 DIV PUSH 100 SUB OUT END"), "95");
+    EXPECT_NO_THROW(db.Execute(req1));
+    EXPECT_NO_THROW(db.Execute(req2));
+    EXPECT_NO_THROW(db.Execute(req3));
+    EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
 }
 
-TEST(CheckJmp, 0) {
-    EXPECT_EQ(runProgrammGetOutput("BEGIN JMP skipCode PUSH 1 OUT skipCode PUSH 2 OUT END"), "2");
-    EXPECT_EQ(runProgrammGetOutput("goBack JMP goEnd BEGIN JMP skipCode PUSH 1 OUT skipCode JMP goBack PUSH 2 OUT goEnd END"), "");
-    EXPECT_EQ(runProgrammGetOutput("BEGIN PUSH 0 PUSH 1 PUSH 2 JNE goEnd OUT goEnd END"), "");
-    EXPECT_EQ(runProgrammGetOutput("BEGIN PUSH 0 PUSH 1 PUSH 2 JEQ goEnd OUT goEnd END"), "0");
+TEST(SmokeCheckInsert, 2) {
+    Database db;
+    std::string_view req1 = "create table users ({autoincrement} id : int32, {autoincrement} id2 : int32, id3 : int32=1, {unique} login: string[32])";
+    std::string_view req2 = R"(insert (,,,"name1") to users)";
+    std::string_view req3 = R"(insert (id=10,,,login = "name2") to users)";
+    std::string_view req4 = R"(insert (10,,11,"name3") to users)";
+    std::string_view req5 = R"(insert (,10,,"name4) to users)";
+
+    EXPECT_NO_THROW(db.Execute(req1));
+    EXPECT_NO_THROW(db.Execute(req2));
+    EXPECT_NO_THROW(db.Execute(req3));
+    EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
 }
 
-TEST(CheckFunc, 0) {
-    EXPECT_EQ(runProgrammGetOutput("func PUSH 2 POPR reg0 RET BEGIN CALL func PUSHR reg0 OUT END"), "2");
+TEST(ErrParseCheckInsert, 0) {
+    Database db;
+    std::string_view req1 = "create table users ({autoincrement} id : int32, {autoincrement} id2 : int32, id3 : int32=1, {unique} login: string[32])";
+    std::string_view req2 = R"(insert (,,"name1") to users)";
+    std::string_view req3 = R"(insert (,,,id=10,login = "name2") to users)";
+    std::string_view req4 = R"(insert (id=10,12,11,"name3") to users)";
+    std::string_view req5 = R"(insert ("10",12,11,"name4") to users)";
+    std::string_view req6 = R"(insert ("10",12,11,"name4") to users)";
+
+    EXPECT_ANY_THROW(db.Execute(req1));
+    EXPECT_ANY_THROW(db.Execute(req2));
+    EXPECT_ANY_THROW(db.Execute(req3));
+    EXPECT_ANY_THROW(db.Execute(req4));
+    EXPECT_ANY_THROW(db.Execute(req5));
+    EXPECT_ANY_THROW(db.Execute(req6));
 }
 
-TEST(CheckFuncCallFunc, 0) {
-    EXPECT_EQ(runProgrammGetOutput("func PUSH 123 CALL func2 OUT RET BEGIN CALL func END func2 PUSH 321 OUT RET"), "321123");
+TEST(CheckSelect, 0) {
+    Database db;
+    std::string_view req1 = "create table users ({autoincrement} id : int32, {autoincrement} id2 : int32, id3 : int32=1, {unique} login: string[32])";
+    std::string_view req2 = R"(insert (,,,"name1") to users)";
+    std::string_view req3 = R"(insert (id=10,,,login = "name2") to users)";
+    std::string_view req4 = R"(insert (10,,11,"name3") to users)";
+    std::string_view req5 = R"(insert (,10,,"name4") to users)";
+    std::string_view req6 = R"(select id, id3, login from users where id=11)";
+
+    EXPECT_NO_THROW(db.Execute(req1));
+    EXPECT_NO_THROW(db.Execute(req2));
+    EXPECT_NO_THROW(db.Execute(req3));
+    EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
+    TableView res;
+    EXPECT_NO_THROW(res = db.Execute(req5).value());
+    int ind = 0;
+    for (auto row : res) {
+        ind++;
+        EXPECT_EQ(row.Get<int32_t>("id"), 11);
+        EXPECT_EQ(row.Get<int32_t>("id2"), 10);
+        EXPECT_EQ(row.Get<int32_t>("id3"), 12);
+        EXPECT_EQ(row.Get<std::string>("login"), "name4");
+    }
+    EXPECT_EQ(ind, 1);
 }
 
-TEST(CheckRecursion, 0) {
-    EXPECT_EQ(runProgrammGetOutput("funcRec PUSHR reg0 OUT PUSH 1 PUSHR reg0 SUB POPR reg0 PUSHR reg0 PUSH 0 JAE goToRet CALL funcRec goToRet RET BEGIN PUSH 5 POPR reg0 CALL funcRec END"),
-                                   "54321");
-}
-
-
-TEST(CheckIn, 0) {
-    std::ofstream file("input");
-    file << "BEGIN IN OUT END";
-    file.close();
-
-    std::istringstream input;
-    input.str("123");
-    auto cin_buff = std::cin.rdbuf();
-    std::cin.rdbuf(input.rdbuf());
-    
-    std::ostringstream output;
-    auto cout_buff = std::cout.rdbuf();
-    std::cout.rdbuf(output.rdbuf());
-
-    emulator::Emulator emulator("./input");
-    emulator.run();
-
-    std::cout.rdbuf(cout_buff);
-    std::cin.rdbuf(cin_buff);
-
-    EXPECT_EQ(output.str(), "123");
-}
-*/
-/*
 int main(int argc, char **argv) {
     srand(1303);
 
     ::testing::InitGoogleTest(&argc, argv); 
     return RUN_ALL_TESTS();
-}*/
+}

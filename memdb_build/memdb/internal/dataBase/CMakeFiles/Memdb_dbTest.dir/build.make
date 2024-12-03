@@ -93,7 +93,12 @@ Memdb_dbTest_EXTERNAL_OBJECTS =
 memdb/internal/dataBase/Memdb_dbTest: memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.o
 memdb/internal/dataBase/Memdb_dbTest: memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make
 memdb/internal/dataBase/Memdb_dbTest: lib/libgtest_main.a
+memdb/internal/dataBase/Memdb_dbTest: memdb/internal/dataBase/libMemdb_db.a
 memdb/internal/dataBase/Memdb_dbTest: lib/libgtest.a
+memdb/internal/dataBase/Memdb_dbTest: memdb/internal/parser/libparser.a
+memdb/internal/dataBase/Memdb_dbTest: memdb/internal/type/libtype.a
+memdb/internal/dataBase/Memdb_dbTest: memdb/internal/column/libcolumn.a
+memdb/internal/dataBase/Memdb_dbTest: memdb/internal/table/libtable.a
 memdb/internal/dataBase/Memdb_dbTest: memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Memdb_dbTest"
 	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Memdb_dbTest.dir/link.txt --verbose=$(VERBOSE)

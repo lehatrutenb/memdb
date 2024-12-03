@@ -11,10 +11,7 @@ if (NOT SetDebugBuildType)
     add_compile_options(-O2)
 endif()
 
-#set(PATH_TO_PROGRAM "/Users/lehatrutenb/Desktop/hse/1_course/C++/Emulator/Emulator/Emulator/Runner/Factorial")
-#configure_file(${PROJECT_SOURCE_DIR}/Runner/include/runner.hpp.in ${PROJECT_SOURCE_DIR}/Runner/include/runner.hpp)
-
-add_executable(Memdb memdb/internal/dataBase/db.cpp)
+#add_executable(Memdb memdb/internal/dataBase/db.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -29,4 +26,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
 
+add_subdirectory(memdb/internal/type)
+add_subdirectory(memdb/internal/column)
+add_subdirectory(memdb/internal/table)
+add_subdirectory(memdb/internal/parser)
 add_subdirectory(memdb/internal/dataBase)

@@ -34,8 +34,8 @@ bool TableView::Iterator::operator==(const Iterator& o) const { return now == o.
 bool TableView::Iterator::operator!=(const Iterator& o) const { return now != o.now; };
 
 
-    
-TableView::TableView(std::map<std::string, ssize_t> col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_)  {}
+TableView::TableView() {}
+TableView::TableView(std::map<std::string, ssize_t> col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_) {}
 
 TableView::Iterator TableView::begin() {
     return Iterator(columns.begin());
@@ -51,22 +51,22 @@ Table::Value::Value(const std::shared_ptr<DbType>& fValue_) : fValue(fValue_) {}
 Table::Value::Value(const std::string& fName_, const std::shared_ptr<DbType>& fValue_) : fName(fName_), fValue(fValue_) {};
 
 Table::Table(const std::string_view& tName_) : tName(tName_){};
-void Table::AddColumn(const ColumnType& colTp, const ColumnDescription& descr) { // nullptr
+void Table::AddColumn(const ColumnFullDescription& descr) { // nullptr
     if (name2Ind.find(descr.name) != name2Ind.end()) {
         throw std::runtime_error("error");
         exit(-1); // throw exc
     }
     std::shared_ptr<Column> newCol;
-    if (colTp.t == Type::Int32) {
+    if (descr.t == Type::Int32) {
         std::shared_ptr<Column> tm{new ColumnInt32(descr)};
         newCol.swap(tm);
-    } else if (colTp.t == Type::Bool) {
+    } else if (descr.t == Type::Bool) {
         std::shared_ptr<Column> tm{new ColumnBool(descr)};
         newCol.swap(tm);
-    } else if (colTp.t == Type::String) {
+    } else if (descr.t == Type::String) {
         std::shared_ptr<Column> tm{new ColumnString(descr)};
         newCol.swap(tm);
-    } else if (colTp.t == Type::Bytes) {
+    } else if (descr.t == Type::Bytes) {
         std::shared_ptr<Column> tm{new ColumnBytes(descr)};
         newCol.swap(tm);
     }

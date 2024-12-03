@@ -8,7 +8,11 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
   "/Users/lehatrutenb/Desktop/prog/memdb/CMakeLists.txt"
+  "/Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/column/CMakeLists.txt"
   "/Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase/CMakeLists.txt"
+  "/Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/parser/CMakeLists.txt"
+  "/Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/table/CMakeLists.txt"
+  "/Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/type/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
@@ -81,15 +85,23 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "_deps/googletest-build/googletest/generated/gtest.pc"
   "_deps/googletest-build/googletest/generated/gtest_main.pc"
   "_deps/googletest-build/googletest/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "memdb/internal/type/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "memdb/internal/column/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "memdb/internal/table/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "memdb/internal/parser/CMakeFiles/CMakeDirectoryInformation.cmake"
   "memdb/internal/dataBase/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/Memdb.dir/DependInfo.cmake"
   "_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/DependInfo.cmake"
   "_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/DependInfo.cmake"
   "_deps/googletest-build/googletest/CMakeFiles/gtest.dir/DependInfo.cmake"
   "_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/DependInfo.cmake"
+  "memdb/internal/type/CMakeFiles/type.dir/DependInfo.cmake"
+  "memdb/internal/column/CMakeFiles/column.dir/DependInfo.cmake"
+  "memdb/internal/table/CMakeFiles/table.dir/DependInfo.cmake"
+  "memdb/internal/parser/CMakeFiles/parser.dir/DependInfo.cmake"
   "memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/DependInfo.cmake"
+  "memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/DependInfo.cmake"
   )

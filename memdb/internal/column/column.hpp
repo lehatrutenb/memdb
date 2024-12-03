@@ -65,12 +65,16 @@ private:
 };
 
 struct ColumnInt32;
+struct ColumnString;
+struct ColumnBytes;
 
 template<typename T, typename DbT>
 class ColumnBase : public Column {
 public:
 friend ColumnInt32;
-    ColumnBase(ColumnDescription descr) : Column(descr.tps, descr.name) {
+friend ColumnString;
+friend ColumnBytes;
+    ColumnBase(ColumnFullDescription descr) : Column(descr.tps, descr.name), columnT(descr){
         if (descr.defVal.get()->getType() == Type::Empty) {
             defVal = {};
         } else {
@@ -137,25 +141,30 @@ friend ColumnInt32;
     }
 
 private:
+    ColumnType columnT;
     std::optional<T> defVal;
     DbType_s<T> cur = DbType_s<T>{};
 };
 
 struct ColumnInt32 : public ColumnBase<int32_t, DbInt32> {
     using baseColT = ColumnBase<int32_t, DbInt32>;
-    ColumnInt32(const ColumnDescription& descr);
+    ColumnInt32(const ColumnFullDescription& descr);
     virtual ssize_t push() override;
 };
 
 struct ColumnBool : public ColumnBase<bool, DbBool> {
-    ColumnBool(const ColumnDescription& descr);
+    ColumnBool(const ColumnFullDescription& descr);
 };
 
 struct ColumnString : public ColumnBase<std::string, DbString> {
-    ColumnString(const ColumnDescription& descr);
+    using baseColT = ColumnBase<std::string, DbString>;
+    ColumnString(const ColumnFullDescription& descr);
+    virtual ssize_t push(std::shared_ptr<DbType> x) override;
 };
 
 struct ColumnBytes : public ColumnBase<std::vector<char>, DbBytes> {
-    ColumnBytes(const ColumnDescription& descr);
+    using baseColT = ColumnBase<std::vector<char>, DbBytes>;
+    ColumnBytes(const ColumnFullDescription& descr);
+    virtual ssize_t push(std::shared_ptr<DbType> x) override;
 };
 }

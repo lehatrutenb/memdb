@@ -57,6 +57,7 @@ struct TableView {
 
     public:
     
+    TableView();
     TableView(std::map<std::string, ssize_t> col2ind_, std::vector<Row> columns_);
 
     std::map<std::string, ssize_t> col2ind;
@@ -77,7 +78,7 @@ public:
     };
 
     Table(const std::string_view& tName_);
-    void AddColumn(const ColumnType& colTp, const ColumnDescription& descr);
+    void AddColumn(const ColumnFullDescription& descr);
 
     void Insert(const std::vector<Value>& values);
 

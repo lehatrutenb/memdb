@@ -123,13 +123,13 @@ bool CrateIndexParser::Check(parser::TokenStructure& ts) {
 
 
 
-void Parser::parseSpaces(const std::string_view& s, int& ind) {
+void Parser::parseSpaces(const std::string_view& s, ssize_t& ind) {
     while (ind < s.size() && s[ind] == ' ') {
         ind++;
     }
 }
 
-std::string Parser::parseWord(const std::string_view& s, int& ind) {
+std::string Parser::parseWord(const std::string_view& s, ssize_t& ind) {
     parseSpaces(s, ind);
     std::string word = "";
     while (ind < s.size() && s[ind] != ' ') {
@@ -139,11 +139,11 @@ std::string Parser::parseWord(const std::string_view& s, int& ind) {
     return word;
 }
 
-parser::TokenStructure Parser::Parse(const std::string_view& preS, int l, int r) { // return struct not void TODO
+parser::TokenStructure Parser::Parse(const std::string_view& preS, ssize_t l, ssize_t r) { // return struct not void TODO
     std::string s = "";
     bool insideString = false, insideLen = false;
     for (int i = l; i <= r; i++) { // to parse words with spaces between
-        s += lexer::AddSpace(preS, i, insideString, insideLen);  // care - change index itself
+        s += lexer::AddSpace(preS, i, insideString, insideLen, r);  // care - change index itself
     }
 
     if (insideLen || insideString) {
@@ -154,7 +154,9 @@ parser::TokenStructure Parser::Parse(const std::string_view& preS, int l, int r)
 
     std::vector<std::string> inp;
     while (l < s.size()) {
+        parseSpaces(s, l);
         inp.emplace_back(parseWord(s, l));
+        parseSpaces(s, l);
     }
 
     std::vector<std::shared_ptr<Tokenizer::Token>> tokens = Tokenizer{}.Tokenize(inp, 0);
@@ -168,13 +170,15 @@ parser::TokenStructure Parser::Parse(const std::string_view& preS, int l, int r)
     return parser::TokenStructure(std::move(tokens), 0, tokens.size() - 1);
 }
 
+}
+}
 
-
-std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> Parser::ParseCreate(const std::string_view& preS, int l, int r) { // return struct not void TODO
+/*
+std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> Parser::ParseCreate(const std::string_view& preS, ssize_t l, ssize_t r) { // return struct not void TODO
     std::string s = "";
     bool insideString = false, insideLen = false;
     for (int i = l; i <= r; i++) { // to parse words with spaces between
-        s += lexer::AddSpace(preS, i, insideString, insideLen);  // care - change index itself
+        s += lexer::AddSpace(preS, i, insideString, insideLen, r);  // care - change index itself
     }
 
     if (insideLen || insideString) {
@@ -216,11 +220,11 @@ std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> Parser::Pars
     //auto res = parser::InserValuesParser{}.Parse(tokens, 0, tokens.size() - 1);
 }
 
-std::pair<bool, std::pair<std::string, parser::InsertData>> Parser::ParseInsert(const std::string_view& preS, int l, int r) { // return struct not void TODO
+std::pair<bool, std::pair<std::string, parser::InsertData>> Parser::ParseInsert(const std::string_view& preS, ssize_t l, ssize_t r) { // return struct not void TODO
     std::string s = "";
     bool insideString = false, insideLen = false;
     for (int i = l; i <= r; i++) { // to parse words with spaces between
-        s += lexer::AddSpace(preS, i, insideString, insideLen);  // care - change index itself
+        s += lexer::AddSpace(preS, i, insideString, insideLen, r);  // care - change index itself
     }
 
     if (insideLen || insideString) {
@@ -264,4 +268,4 @@ std::pair<bool, std::pair<std::string, parser::InsertData>> Parser::ParseInsert(
 }
 
 }
-}
+}*/

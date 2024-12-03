@@ -95,7 +95,7 @@ namespace lexer {
         {":", Other::TWOPOINT}, {",", Other::COMMA},
     };
 
-    std::string AddSpace(const std::string_view& s, int& ind, bool& insideString, bool& insideLen);
+    std::string AddSpace(const std::string_view& s, int& ind, bool& insideString, bool& insideLen, ssize_t r);
 
     std::pair<bool, Command> IsCommand(std::vector<std::string>& inp, int ind);
 

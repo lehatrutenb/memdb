@@ -40,6 +40,10 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-build/cmake_install.cmake")
+  include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/type/cmake_install.cmake")
+  include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/column/cmake_install.cmake")
+  include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/table/cmake_install.cmake")
+  include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/parser/cmake_install.cmake")
   include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase/cmake_install.cmake")
 
 endif()

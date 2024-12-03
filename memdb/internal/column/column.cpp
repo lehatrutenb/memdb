@@ -48,7 +48,7 @@ std::string_view Column::Name() {
 
 
 
-ColumnInt32::ColumnInt32(const ColumnDescription& descr) : ColumnBase<int32_t, DbInt32>(descr) {}
+ColumnInt32::ColumnInt32(const ColumnFullDescription& descr) : ColumnBase<int32_t, DbInt32>(descr) {}
 ssize_t ColumnInt32::push() {
     if (baseColT::defVal.has_value()) {
         auto val = defVal.value();
@@ -67,10 +67,25 @@ ssize_t ColumnInt32::push() {
     return -1;
 }
 
-ColumnBool::ColumnBool(const ColumnDescription& descr) : ColumnBase<bool, DbBool>(descr) {}
+ColumnBool::ColumnBool(const ColumnFullDescription& descr) : ColumnBase<bool, DbBool>(descr) {}
 
-ColumnString::ColumnString(const ColumnDescription& descr) : ColumnBase<std::string, DbString>(descr) {}
+ColumnString::ColumnString(const ColumnFullDescription& descr) : ColumnBase<std::string, DbString>(descr) {}
+ssize_t ColumnString::push(std::shared_ptr<DbType> x)  {
+    if (baseColT::columnT.maxLength >= getValue<DbString, std::string>(x).size()) {
+        return baseColT::push(x);
+    }
+    // throw ex got too large string
+    throw std::runtime_error("error");
+    return -1;
+}
 
-ColumnBytes::ColumnBytes(const ColumnDescription& descr) : ColumnBase<std::vector<char>, DbBytes>(descr) {}
-
+ColumnBytes::ColumnBytes(const ColumnFullDescription& descr) : ColumnBase<std::vector<char>, DbBytes>(descr) {}
+ssize_t ColumnBytes::push(std::shared_ptr<DbType> x)  {
+    if (baseColT::columnT.maxLength * 2 + 2 >= getValue<DbBytes, std::vector<char>>(x).size()) { // + 2 eq to 0x
+        return baseColT::push(x);
+    }
+    // throw ex got too large byte arr
+    throw std::runtime_error("error");
+    return -1;
+}
 }

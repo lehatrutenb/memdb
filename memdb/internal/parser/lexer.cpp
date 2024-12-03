@@ -9,7 +9,7 @@
 
 namespace memdb {
 namespace lexer {
-    std::string AddSpace(const std::string_view& s, int& ind, bool& insideString, bool& insideLen) { // care - change index itself
+    std::string AddSpace(const std::string_view& s, int& ind, bool& insideString, bool& insideLen, ssize_t r) { // care - change index itself
         char ch = s[ind];
         std::string res;
         if (ch == '"') {
@@ -20,35 +20,29 @@ namespace lexer {
             res.push_back(ch);
             return res;
         }
-        if (isdigit(ch) || isalpha(ch) || ch == '.' || ch == '"' || ch == '_' || ch == '#' || ch == '@' || ch == ' ') {
+        if (isdigit(ch) || isalpha(ch) || ch == '.' || ch == '"' || ch == '_' || ch == '#' || ch == '@' || ch == ' ' || ch == '$' || ch == ';') {
             res.push_back(ch);
             return res;
         }
-        if (ind == static_cast<int>(s.size()) - 1) {
-            res.push_back(' ');
+        res.push_back(' ');
+        if (ind + 1 <= r && (ch == '|' && s[ind + 1] == '|')||(ch == '&' && s[ind + 1] == '&')||(ch == '^' && s[ind + 1] == '^')||((ch=='<'||ch=='>'||ch=='!')&&s[ind + 1]=='=')) {
+            ind++;
             res.push_back(ch);
-            return res;
+            res.push_back(s[ind]);
         } else {
-            res.push_back(' ');
-            if ((ch == '|' && s[ind + 1] == '|')||(ch == '&' && s[ind + 1] == '&')||(ch == '^' && s[ind + 1] == '^')||((ch=='<'||ch=='>'||ch=='!')&&s[ind + 1]=='=')) {
-                ind++;
-                res.push_back(ch);
-                res.push_back(s[ind]);
-            } else {
-                if (ch == '|') {
-                    insideLen ^= 1;
-                    if (insideLen) {
-                        res += "|{";
-                    } else {
-                        res += "}|";
-                    }
+            if (ch == '|') {
+                insideLen ^= 1;
+                if (insideLen) {
+                    res += "|{";
                 } else {
-                    res.push_back(ch);
+                    res += "}|";
                 }
+            } else {
+                res.push_back(ch);
             }
-            res.push_back(' ');
-            return res;
         }
+        res.push_back(' ');
+        return res;
     } 
 
     std::pair<bool, Command> IsCommand(std::vector<std::string>& inp, int ind) {

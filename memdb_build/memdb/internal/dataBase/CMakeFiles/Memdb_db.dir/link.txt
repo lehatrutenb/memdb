@@ -1,1 +1,2 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/Memdb_db.dir/db.cpp.o -o Memdb_db 
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libMemdb_db.a CMakeFiles/Memdb_db.dir/db.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libMemdb_db.a

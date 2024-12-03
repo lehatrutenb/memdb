@@ -319,6 +319,9 @@ Memdb_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Memdb_SOURCE_DIR:STATIC=/Users/lehatrutenb/Desktop/prog/memdb
 
+//Dependencies for the target
+Memdb_db_LIB_DEPENDS:STATIC=general;parser;general;type;general;column;general;table;
+
 //Set on if want not to build as release and use O2
 SetDebugBuildType:BOOL=ON
 
@@ -501,7 +504,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=9
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
