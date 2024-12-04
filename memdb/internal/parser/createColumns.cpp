@@ -56,10 +56,23 @@ std::vector<ColumnAttrs> ColumnParser::parseAttrs(const std::vector<std::shared_
     std::vector<ColumnAttrs> res;
     for (int i = l + 1; i <= r; i++) {
         if (checkBracketed(inp, l, i, lexer::Bracket::FIGUREO, lexer::Bracket::FIGUREC)) {
+            bool expComma = false;
             for (int j = l + 1; j < i; j++) {
                 if (inp[j]->GetType() == Tokenizer::TokenT::OTHER && getValue<Tokenizer::OtherT, lexer::Other>(inp[j]) == lexer::Other::COMMA) {
+                    if (!expComma) {
+                         // throw ex - unexp comma in column attrs
+                        throw std::runtime_error("error");
+                        exit(-1);
+                    }
+                    expComma = false;
                     continue;
                 } else if (inp[j]->GetType() == Tokenizer::TokenT::ATTRIBUTE) {
+                    if (expComma) {
+                         // throw ex - exp comma between attrs in column attrs
+                        throw std::runtime_error("error");
+                        exit(-1);
+                    }
+                    expComma = true;
                     switch (getValue<Tokenizer::AttributeT, lexer::Attribute>(inp[j])) {
                         case lexer::Attribute::AUTOINCREMENT:
                             res.push_back(ColumnAttrs::Autoincrement);

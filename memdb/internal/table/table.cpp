@@ -94,7 +94,7 @@ void Table::Insert(const std::vector<Value>& values) {
     for (int i = 0; i < values.size(); i++) {
         const auto& value = values[i];
 
-        listType |= (value.fName == "" && value.fValue.get()->getType() == Type::Empty);
+        listType |= (value.fName == "" && value.fValue.get()->getType() != Type::Empty);
         mapType |= !(value.fName == "");
         if (value.fName == "" ) {
             continue;
@@ -103,7 +103,7 @@ void Table::Insert(const std::vector<Value>& values) {
         if (name2Ind.find(value.fName) != name2Ind.end()) {
             auto curCol = name2Ind.find(value.fName);
             if (setted[curCol->second] != -1) {
-                // throw ex - col names should be unique
+                // throw ex - insert column same column setted twice
                 throw std::runtime_error("error");
             }
             setted[curCol->second] = i;
@@ -117,6 +117,10 @@ void Table::Insert(const std::vector<Value>& values) {
         throw std::runtime_error("error");
     }
 
+    if (values.size() > columns.size()) {
+        // throw ex - should be one per each col
+        throw std::runtime_error("error");
+    }
     if (listType) {
         if (values.size() != columns.size()) {
             // throw ex - should be one per each col
@@ -128,7 +132,17 @@ void Table::Insert(const std::vector<Value>& values) {
             }
         }
         //std::iota(setted.begin(), setted.end(), 0);
+    } else {
+        for (int i = 0; i < values.size(); i++) {
+            if (values[i].fValue.get()->getType() == Type::Empty) {
+                if (setted[i] != -1) {
+                    // throw ex - insert column same column setted twice
+                    throw std::runtime_error("error");
+                }
+            }
+        }
     }
+
 
     for (int i = 0; i < columns.size(); i++) {
         if (setted[i] == -1) {

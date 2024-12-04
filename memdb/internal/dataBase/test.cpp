@@ -74,14 +74,16 @@ TEST(CheckCreateTableBad, 0) {
     EXPECT_ANY_THROW(db.Execute(req2));
     std::string_view req3 = R"(create table users ({} id : int32=""))";
     EXPECT_ANY_THROW(db.Execute(req3));
+    std::string_view req4 = R"(create table users ({unique key} id : int32))";
+    EXPECT_ANY_THROW(db.Execute(req4));
 }
 
 TEST(SmokeCheckInsert, 0) {
     Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
     std::string_view req2 = R"(insert (,"vasya", 0xdeadbeefdeadbeef,) to users)";
-    std::string_view req3 = R"(insert (id=6,login = "vasya", password_hash = 0xdeadbeefdeadbeef, false) to users)";
-    std::string_view req4 = R"(insert (login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req3 = R"(insert (id=6,login = "vasya", password_hash = 0xdeadbeefdeadbeef, is_admin=false) to users)";
+    std::string_view req4 = R"(insert (,login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
     std::string_view req5 = R"(insert (10,"admin", 0x0000000000000000, true) to users)";
 
     EXPECT_NO_THROW(db.Execute(req1));
@@ -95,8 +97,8 @@ TEST(SmokeCheckInsert, 1) {
     Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
     std::string_view req2 = R"(insert (,"", 0xdeadbeefdeadbeef,) to users)";
-    std::string_view req3 = R"(insert (id=6,login = "12345678901234567890123456789012", password_hash = 0xded, false) to users)";
-    std::string_view req4 = R"(insert (login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
+    std::string_view req3 = R"(insert (id=6,login = "12345678901234567890123456789012", password_hash = 0xded, is_admin=false) to users)";
+    std::string_view req4 = R"(insert (,login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
     std::string_view req5 = R"(insert (10,"admin", 0x0000000000000000, true) to users)";
 
     EXPECT_NO_THROW(db.Execute(req1));
@@ -112,7 +114,7 @@ TEST(SmokeCheckInsert, 2) {
     std::string_view req2 = R"(insert (,,,"name1") to users)";
     std::string_view req3 = R"(insert (id=10,,,login = "name2") to users)";
     std::string_view req4 = R"(insert (10,,11,"name3") to users)";
-    std::string_view req5 = R"(insert (,10,,"name4) to users)";
+    std::string_view req5 = R"(insert (,10,,"name4") to users)";
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_NO_THROW(db.Execute(req2));
@@ -130,7 +132,7 @@ TEST(ErrParseCheckInsert, 0) {
     std::string_view req5 = R"(insert ("10",12,11,"name4") to users)";
     std::string_view req6 = R"(insert ("10",12,11,"name4") to users)";
 
-    EXPECT_ANY_THROW(db.Execute(req1));
+    EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_ANY_THROW(db.Execute(req2));
     EXPECT_ANY_THROW(db.Execute(req3));
     EXPECT_ANY_THROW(db.Execute(req4));
@@ -153,7 +155,7 @@ TEST(CheckSelect, 0) {
     EXPECT_NO_THROW(db.Execute(req4));
     EXPECT_NO_THROW(db.Execute(req5));
     TableView res;
-    EXPECT_NO_THROW(res = db.Execute(req5).value());
+    EXPECT_NO_THROW(res = db.Execute(req6).value());
     int ind = 0;
     for (auto row : res) {
         ind++;
