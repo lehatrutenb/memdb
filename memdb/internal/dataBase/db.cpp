@@ -198,13 +198,18 @@ int main() {
     std::string_view req2 = R"(insert (,0x1234,0x12,0x34) to users)";
     std::string_view req3 = R"(insert (,0x1,0x0,0x9) to users)";
     std::string_view req4 = R"(insert (,0xabcd,0xefab,0x8) to users)";
+    std::string_view req5 = R"(select id from users where c1 = 0x1234)";
     std::string_view req6 = R"(select id from users where |c1| = 1)";
+    std::string_view req7 = R"(select id from users where c1 = 0xabcd && c2=0xefab)";
+
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_NO_THROW(db.Execute(req2));
     EXPECT_NO_THROW(db.Execute(req3));
     EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
     EXPECT_NO_THROW(db.Execute(req6));
+    EXPECT_NO_THROW(db.Execute(req7));
     return 0;
     /*Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";

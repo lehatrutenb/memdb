@@ -239,7 +239,10 @@ int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> rig
         }
         return dynamic_cast<DbBool*>(left.get())->doOp(op, dynamic_cast<DbBool*>(right.get()));
     case Type::Bytes:
-        return dynamic_cast<DbBytes*>(left.get())->doOp(op, nullptr);
+        if (op == Operation::LEN) {
+            return dynamic_cast<DbBytes*>(left.get())->doOp(op, nullptr);
+        }
+        return dynamic_cast<DbBytes*>(left.get())->doOp(op, dynamic_cast<DbBytes*>(right.get()));
     case Type::String:
         if (op == Operation::LEN) {
             return dynamic_cast<DbString*>(left.get())->doOp(op, nullptr);
