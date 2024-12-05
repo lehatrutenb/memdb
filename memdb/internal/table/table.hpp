@@ -15,7 +15,7 @@ struct TableView {
     public:
     class Row {
         public:
-        Row(std::map<std::string, ssize_t> col2ind_, std::vector<void*> data_);
+        Row(std::map<std::string, ssize_t> col2ind_, ssize_t ind_, std::vector<Column::ColumnStructP> colPs_) : rcol2ind(col2ind_), ind(ind_), rcolPs(colPs_) {};
         template<typename T>
         T& Get(std::string colName) {
             if (rcol2ind.find(colName) == rcol2ind.end()) {
@@ -23,14 +23,15 @@ struct TableView {
                 throw std::runtime_error("error");
                 exit(-1);
             }
-            return *static_cast<T*>(data[rcol2ind[colName]]);
+            return static_cast<DbType_s<T>*>(rcolPs[rcol2ind[colName]])->get(ind);
         }
 
-        void*& operator[](ssize_t ind);
+        //void*& operator[](ssize_t ind); what for?
 
         private:
             std::map<std::string, ssize_t> rcol2ind;
-            std::vector<void*> data;
+            std::vector<Column::ColumnStructP> rcolPs;
+            ssize_t ind;
     };
 
     private:
@@ -58,10 +59,12 @@ struct TableView {
     public:
     
     TableView();
-    TableView(std::map<std::string, ssize_t> col2ind_, std::vector<Row> columns_);
+    TableView(std::map<std::string, ssize_t> col2ind_, std::vector<ssize_t> colInds_, std::vector<Column::ColumnStructP> colPs_);
 
     std::map<std::string, ssize_t> col2ind;
-    std::vector<Row> columns;
+    std::vector<ssize_t> colInds;
+    std::vector<Row> readyRows;
+    std::vector<Column::ColumnStructP> colPs;
 
     Iterator begin();
     Iterator end();

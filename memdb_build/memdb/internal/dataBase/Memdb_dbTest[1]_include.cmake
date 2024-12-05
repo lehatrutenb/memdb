@@ -1,5 +1,5 @@
-if(EXISTS "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase/Memdb_dbTest[1]_tests.cmake")
-  include("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase/Memdb_dbTest[1]_tests.cmake")
+if(EXISTS "/home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase/Memdb_dbTest[1]_tests.cmake")
+  include("/home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase/Memdb_dbTest[1]_tests.cmake")
 else()
   add_test(Memdb_dbTest_NOT_BUILT Memdb_dbTest_NOT_BUILT)
 endif()

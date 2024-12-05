@@ -70,7 +70,7 @@ ssize_t ColumnInt32::push() {
 ColumnBool::ColumnBool(const ColumnFullDescription& descr) : ColumnBase<bool, DbBool>(descr) {}
 
 ColumnString::ColumnString(const ColumnFullDescription& descr) : ColumnBase<std::string, DbString>(descr) {}
-ssize_t ColumnString::push(std::shared_ptr<DbType> x)  {
+ssize_t ColumnString::push(std::shared_ptr<DbType> x) {
     if (baseColT::columnT.maxLength >= getValue<DbString, std::string>(x).size()) {
         return baseColT::push(x);
     }

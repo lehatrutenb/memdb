@@ -1,2 +1,2 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libcolumn.a CMakeFiles/column.dir/column.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libcolumn.a
+/usr/bin/ar qc libcolumn.a CMakeFiles/column.dir/column.cpp.o
+/usr/bin/ranlib libcolumn.a

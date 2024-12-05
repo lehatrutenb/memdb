@@ -24,6 +24,7 @@
 13. допустимые символы названий колонок/таблиц: 1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwwertyuiopasdfghjklzxcvbnm@#$;_
 1. разрешить использовать оба типа при insert одновременно
 
+TODO check that user not try to get unknown cols in get
 TODO rm + op from bytes
 TODO check || for str bytes
 TODO autoincrement - check that type ios int
@@ -205,13 +206,14 @@ int main() {
     EXPECT_NO_THROW(db.Execute(req4));
     EXPECT_NO_THROW(db.Execute(req5));
     TableView res;
+    db.Execute(req6);
     EXPECT_NO_THROW(res = db.Execute(req6).value());
     int ind = 0;
     for (auto row : res) {
         ind++;
         EXPECT_EQ(row.Get<int32_t>("id"), 11);
-        EXPECT_EQ(row.Get<int32_t>("id2"), 10);
-        EXPECT_EQ(row.Get<int32_t>("id3"), 12);
+        //EXPECT_ANY_THROW(row.Get<int32_t>("id2"));
+        EXPECT_EQ(row.Get<int32_t>("id3"), 1);
         EXPECT_EQ(row.Get<std::string>("login"), "name4");
     }
     EXPECT_EQ(ind, 1);

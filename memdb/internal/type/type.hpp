@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
-#include <iostream>
+#include <map>
 
 namespace memdb {
 
@@ -54,12 +54,14 @@ public:
 
 class DbTypeEmpty : public DbType {
     public:
+    DbTypeEmpty(){}
     Type getType() override;
     std::shared_ptr<DbType> Copy() override;
 };
 
 class DbInt32 : public DbType {
 public:
+    DbInt32(){}
     DbInt32(int x_);
     Type getType() override;
     int32_t get();
@@ -73,6 +75,7 @@ public:
 
 class DbBool : public DbType {
 public:
+    DbBool(){}
     DbBool(bool x_);
     Type getType() override;
     bool get();
@@ -86,6 +89,7 @@ public:
 
 class DbBytes : public DbType {
 public:
+    DbBytes(){}
     DbBytes(std::vector<char> v_);
     std::vector<char> get();
     Type getType() override;
@@ -99,6 +103,7 @@ public:
 
 class DbString : public DbType {
 public:
+    DbString(){}
     DbString(std::string s_);
     std::string get();
     Type getType() override;
@@ -115,7 +120,9 @@ int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> rig
 template<typename T>
 class DbType_s { //: public DbTypeMassoP<T> {
 public:
-    T get(ssize_t ind) {
+    DbType_s(){}
+    DbType_s(bool unique_): unique(unique_){}
+    T& get(ssize_t ind) {
         // throw ex if not exist
         if (v.find(ind) == v.end()) {
             throw std::runtime_error("error");
@@ -123,13 +130,17 @@ public:
         return v[ind];
     }
 
-    void* getp(ssize_t ind) {
+/*
+    std::unordered_map<ssize_t, T>::iterator getp(ssize_t ind) {
         // throw ex if not exist
-        if (v.find(ind) == v.end()) {
+        auto it = v.find(ind);
+        if (it == v.end()) {
             throw std::runtime_error("error");
         }
-        return static_cast<void*>(&v[ind]);
+        //return static_cast<void*>(&v[ind]);
+        return it;
     }
+    */
 
     void get(std::vector<ssize_t> inds, std::vector<T>& res) {
         res.reserve(inds.size());
@@ -143,7 +154,7 @@ public:
     }
 
     void get(std::vector<bool>& is_fine, std::vector<T>& res) {
-        for (int i = 0; i < sz; i++) {
+        for (int i = 0; i < lastInd; i++) {
             if (is_fine[i]) {
                 // throw ex if not exist
                 if (v.find(i) == v.end()) {
@@ -155,7 +166,7 @@ public:
     }
 
     void get(std::vector<bool>& is_fine, std::vector<void*>& res) {
-        for (int i = 0; i < sz; i++) {
+        for (int i = 0; i < lastInd; i++) {
             if (is_fine[i]) {
                 // throw ex if not exist
                 if (v.find(i) == v.end()) {
@@ -179,16 +190,33 @@ public:
         if (v.find(ind) == v.end()) {
             throw std::runtime_error("error");
         }
+        if (unique) {
+            checkUnique.erase(v[ind]);
+            if (checkUnique.find(obj) != checkUnique.end()) {
+                // throw ex inserted same value to uniue field
+                throw std::runtime_error("error");
+            }
+            checkUnique[obj] = true;
+        }
         v[ind] = obj;
     }
 
     ssize_t push(T& obj) {
-        v[++sz] = obj;
-        fl.push_front(sz); // push front is fine cause location principe
-        ind2it[sz - 1] = fl.begin();
-        ind2it[sz] = fl.before_begin();
+        if (unique) {
+            if (checkUnique.find(obj) != checkUnique.end()) {
+                // throw ex inserted same value to uniue field
+                throw std::runtime_error("error");
+            }
+            checkUnique[obj] = true;
+        }
+        v[++lastInd] = obj;
+        fl.push_front(lastInd); // push front is fine cause location principe
+        ind2it[lastInd - 1] = fl.begin();
+        ind2it[lastInd] = fl.before_begin();
 
-        return sz;
+        sz++;
+
+        return lastInd;
     }
 
     void del(int ind) {
@@ -197,6 +225,9 @@ public:
             throw std::runtime_error("error");
         }
         v.erase(ind);
+        if (unique) {
+            checkUnique.erase(v[ind]);
+        }
         auto it_prev = fl.before_begin();
         auto it_nx = fl.begin();
         while (*it_nx != ind) {
@@ -206,6 +237,8 @@ public:
         fl.erase_after(it_prev);
         //fl.erase_after(ind2it[ind]);
         ind2it.erase(ind);
+
+        sz--;
     }
 
     void del(std::vector<ssize_t> inds) {
@@ -216,6 +249,10 @@ public:
 
     ssize_t size() {
         return sz;
+    }
+
+    ssize_t MaxInd() {
+        return lastInd;
     }
 
     void getInds(std::vector<ssize_t>& res) {
@@ -236,10 +273,13 @@ public:
     ~DbType_s() = default;
 
 private:
+    bool unique = false;
+    std::map<T, bool> checkUnique;
     std::unordered_map<ssize_t, T> v;
     std::forward_list<ssize_t> fl;
     std::unordered_map<ssize_t, FLIt> ind2it; // cmps it to el before
-    ssize_t sz;
+    ssize_t lastInd = 0;
+    ssize_t sz = 0;
 };
 
 struct TableColumn {

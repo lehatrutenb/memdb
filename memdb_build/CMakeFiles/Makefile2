@@ -45,19 +45,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.28.3/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -E rm -f
+RM = /usr/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/lehatrutenb/Desktop/prog/memdb
+CMAKE_SOURCE_DIR = /home/leha/Desktop/memdb/memdb
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/lehatrutenb/Desktop/prog/memdb/memdb_build
+CMAKE_BINARY_DIR = /home/leha/Desktop/memdb/memdb/memdb_build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -224,14 +224,14 @@ memdb/internal/type/clean: memdb/internal/type/CMakeFiles/type.dir/clean
 _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/all: _deps/googletest-build/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=7,8 "Built target gmock"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=7,8 "Built target gmock"
 .PHONY : _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/all
 
 # Build rule for subdir invocation for target.
 _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/rule
 
 # Convenience name for target.
@@ -251,14 +251,14 @@ _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all: _deps/googletes
 _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all: _deps/googletest-build/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=9,10 "Built target gmock_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=9,10 "Built target gmock_main"
 .PHONY : _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all
 
 # Build rule for subdir invocation for target.
 _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule
 
 # Convenience name for target.
@@ -277,14 +277,14 @@ _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/clean:
 _deps/googletest-build/googletest/CMakeFiles/gtest.dir/all:
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=11,12 "Built target gtest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=11,12 "Built target gtest"
 .PHONY : _deps/googletest-build/googletest/CMakeFiles/gtest.dir/all
 
 # Build rule for subdir invocation for target.
 _deps/googletest-build/googletest/CMakeFiles/gtest.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googletest/CMakeFiles/gtest.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : _deps/googletest-build/googletest/CMakeFiles/gtest.dir/rule
 
 # Convenience name for target.
@@ -303,14 +303,14 @@ _deps/googletest-build/googletest/CMakeFiles/gtest.dir/clean:
 _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/all: _deps/googletest-build/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=13,14 "Built target gtest_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=13,14 "Built target gtest_main"
 .PHONY : _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/all
 
 # Build rule for subdir invocation for target.
 _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/rule
 
 # Convenience name for target.
@@ -329,14 +329,14 @@ _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/clean:
 memdb/internal/type/CMakeFiles/type.dir/all:
 	$(MAKE) $(MAKESILENT) -f memdb/internal/type/CMakeFiles/type.dir/build.make memdb/internal/type/CMakeFiles/type.dir/depend
 	$(MAKE) $(MAKESILENT) -f memdb/internal/type/CMakeFiles/type.dir/build.make memdb/internal/type/CMakeFiles/type.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=25,26 "Built target type"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=25,26 "Built target type"
 .PHONY : memdb/internal/type/CMakeFiles/type.dir/all
 
 # Build rule for subdir invocation for target.
 memdb/internal/type/CMakeFiles/type.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/type/CMakeFiles/type.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : memdb/internal/type/CMakeFiles/type.dir/rule
 
 # Convenience name for target.
@@ -355,14 +355,14 @@ memdb/internal/type/CMakeFiles/type.dir/clean:
 memdb/internal/column/CMakeFiles/column.dir/all:
 	$(MAKE) $(MAKESILENT) -f memdb/internal/column/CMakeFiles/column.dir/build.make memdb/internal/column/CMakeFiles/column.dir/depend
 	$(MAKE) $(MAKESILENT) -f memdb/internal/column/CMakeFiles/column.dir/build.make memdb/internal/column/CMakeFiles/column.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=5,6 "Built target column"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=5,6 "Built target column"
 .PHONY : memdb/internal/column/CMakeFiles/column.dir/all
 
 # Build rule for subdir invocation for target.
 memdb/internal/column/CMakeFiles/column.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/column/CMakeFiles/column.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : memdb/internal/column/CMakeFiles/column.dir/rule
 
 # Convenience name for target.
@@ -381,14 +381,14 @@ memdb/internal/column/CMakeFiles/column.dir/clean:
 memdb/internal/table/CMakeFiles/table.dir/all:
 	$(MAKE) $(MAKESILENT) -f memdb/internal/table/CMakeFiles/table.dir/build.make memdb/internal/table/CMakeFiles/table.dir/depend
 	$(MAKE) $(MAKESILENT) -f memdb/internal/table/CMakeFiles/table.dir/build.make memdb/internal/table/CMakeFiles/table.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=23,24 "Built target table"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=23,24 "Built target table"
 .PHONY : memdb/internal/table/CMakeFiles/table.dir/all
 
 # Build rule for subdir invocation for target.
 memdb/internal/table/CMakeFiles/table.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/table/CMakeFiles/table.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : memdb/internal/table/CMakeFiles/table.dir/rule
 
 # Convenience name for target.
@@ -409,14 +409,14 @@ memdb/internal/parser/CMakeFiles/parser.dir/all: memdb/internal/column/CMakeFile
 memdb/internal/parser/CMakeFiles/parser.dir/all: memdb/internal/table/CMakeFiles/table.dir/all
 	$(MAKE) $(MAKESILENT) -f memdb/internal/parser/CMakeFiles/parser.dir/build.make memdb/internal/parser/CMakeFiles/parser.dir/depend
 	$(MAKE) $(MAKESILENT) -f memdb/internal/parser/CMakeFiles/parser.dir/build.make memdb/internal/parser/CMakeFiles/parser.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=15,16,17,18,19,20,21,22 "Built target parser"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=15,16,17,18,19,20,21,22 "Built target parser"
 .PHONY : memdb/internal/parser/CMakeFiles/parser.dir/all
 
 # Build rule for subdir invocation for target.
 memdb/internal/parser/CMakeFiles/parser.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 14
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/parser/CMakeFiles/parser.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : memdb/internal/parser/CMakeFiles/parser.dir/rule
 
 # Convenience name for target.
@@ -438,14 +438,14 @@ memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/all: memdb/internal/table/CMakeF
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/all: memdb/internal/parser/CMakeFiles/parser.dir/all
 	$(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/depend
 	$(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=1,2 "Built target Memdb_db"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=1,2 "Built target Memdb_db"
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/all
 
 # Build rule for subdir invocation for target.
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 16
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 16
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule
 
 # Convenience name for target.
@@ -470,14 +470,14 @@ memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/all: memdb/internal/parser/C
 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/all: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/all
 	$(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/depend
 	$(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=3,4 "Built target Memdb_dbTest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=3,4 "Built target Memdb_dbTest"
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/all
 
 # Build rule for subdir invocation for target.
 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 22
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 22
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
 
 # Convenience name for target.

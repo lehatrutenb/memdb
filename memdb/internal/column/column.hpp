@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <optional>
+#include <iostream>
 
 namespace memdb {
 
@@ -37,6 +38,7 @@ struct ColumnFullDescription : public ColumnType, public ColumnDescription {
 
 class Column {
 public:
+    using ColumnStructP = void*;
     Column(std::vector<ColumnAttrs> tps, std::string_view name_);
 
     virtual ssize_t push() = 0;
@@ -45,7 +47,7 @@ public:
     virtual void update(ssize_t ind, std::shared_ptr<DbType> x) = 0;
     virtual std::shared_ptr<DbType> Get(ssize_t ind) = 0;
     virtual void Get(std::vector<bool>& is_fine, std::vector<void*>& res) = 0;
-    virtual void* GetP(ssize_t ind) = 0;
+    virtual ColumnStructP GetP() = 0;
     virtual void getInds(std::vector<ssize_t>& res) = 0;
 
     bool Unique();
@@ -57,6 +59,7 @@ public:
     std::string_view Name();
 
     virtual ssize_t size() = 0;
+    virtual ssize_t MaxInd() = 0;
     virtual DbType_s<int32_t>::FLIt begin() = 0; // type there doesn't really matter
     virtual DbType_s<int32_t>::FLIt end() = 0;
 private:
@@ -80,11 +83,17 @@ friend ColumnBytes;
         } else {
             defVal = std::optional<T>{dynamic_cast<DbT*>(descr.defVal.get())->get()};
         }
+        cur = DbType_s<T>(Column::Unique());
     }
     
     ssize_t push(std::shared_ptr<DbType> x) override {
         if (x->getType() == Type::Empty) { // not obligitary (cause checks in insert) but let it be
             return push();
+        }
+        if (x->getType() != DbT{}.getType()) {
+            // throw ex got another type
+            throw std::runtime_error("error");
+            return -1;
         }
         T x_ = dynamic_cast<DbT*>(x.get())->get();
         return cur.push(x_);
@@ -116,10 +125,11 @@ friend ColumnBytes;
         cur.get(isFine, res);
     }
 
-    void* GetP(ssize_t ind) override {
+/*
+    std::unordered_map<ssize_t, T>::iterator GetP(ssize_t ind) override {
         return cur.getp(ind);
     }
-
+*/
     virtual std::shared_ptr<DbType> Get(ssize_t ind) override {
         return std::shared_ptr<DbType>{new DbT{get(ind)}};
     }
@@ -132,18 +142,26 @@ friend ColumnBytes;
         return cur.end();
     }
 
-    ssize_t size()  override {
+    ssize_t size() override {
         return cur.size();
+    }
+
+    ssize_t MaxInd() override {
+        return cur.MaxInd();
     }
 
     void getInds(std::vector<ssize_t>& res) override {
         cur.getInds(res);
     }
 
+    ColumnStructP GetP() override {
+        return static_cast<ColumnStructP>(&cur);
+    }
+
 private:
     ColumnType columnT;
     std::optional<T> defVal;
-    DbType_s<T> cur = DbType_s<T>{};
+    DbType_s<T> cur;
 };
 
 struct ColumnInt32 : public ColumnBase<int32_t, DbInt32> {

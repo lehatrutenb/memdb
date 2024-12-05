@@ -8,16 +8,14 @@
 // it is not really max size - just size that will be allocated since start
 namespace memdb {
 
-
-TableView::Row::Row(std::map<std::string, ssize_t> col2ind_, std::vector<void*> data_) : rcol2ind(col2ind_), data(data_){};
-
+/*
 void*& TableView::Row::operator[](ssize_t ind) {
     return data[ind];
 }
+*/
 
 
-
-TableView::Iterator::Iterator(std::vector<Row>::iterator now_) : now(now_){}
+TableView::Iterator::Iterator(std::vector<Row>::iterator now_) : now(now_)  {}
 
 TableView::Iterator::reference TableView::Iterator::operator*() {
     return *now;
@@ -35,13 +33,18 @@ bool TableView::Iterator::operator!=(const Iterator& o) const { return now != o.
 
 
 TableView::TableView() {}
-TableView::TableView(std::map<std::string, ssize_t> col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_) {}
+TableView::TableView(std::map<std::string, ssize_t> col2ind_, std::vector<ssize_t> colInds_, std::vector<Column::ColumnStructP> colPs_): col2ind(col2ind_), colInds(colInds_), colPs(colPs_) {
+    readyRows.reserve(colInds.size());
+    for (auto& ind: colInds) {
+        readyRows.push_back(Row(col2ind, ind, colPs)); //TODO why I can't use references here
+    }
+}
 
 TableView::Iterator TableView::begin() {
-    return Iterator(columns.begin());
+    return Iterator(readyRows.begin());
 }
 TableView::Iterator TableView::end() {
-    return Iterator(columns.end());
+    return Iterator(readyRows.end());
 }
 
 
@@ -179,12 +182,12 @@ ssize_t Table::where(parser::Condition& cond) {
         return 0;
     }
     std::map<TableColumn, std::shared_ptr<DbType>> vals;
-
-    isFine.resize(columns[0]->size());
+    isFine.resize(columns[0]->MaxInd());
     ssize_t fineAmt = 0;
     bool gotFineInds = false;
     // and are there wait to write base loop
     for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
+    //for (auto ind : *columns[0]) { // CARE it is safe cause we don't delete full colums and each col must have simular size
         ssize_t ind = *it;
         for (auto& tc : need) {
             vals[tc] = columns[name2Ind[tc.column]]->Get(ind);
@@ -272,29 +275,44 @@ TableView Table::Select(const std::vector<TableColumn>& tcs, parser::Condition& 
             exit(-1);
         }
     }
+
+    ssize_t colInd = 0;
+    std::vector<Column::ColumnStructP> tableViewColumns(colAmt, nullptr);
+    std::map<std::string, ssize_t> curCol2ind;
+    for (const auto& tc : tcs) {
+        if (tc.table != tName) {
+            continue;
+        }
+        curCol2ind[tc.column] = colInd;
+        tableViewColumns[colInd++] = columns[name2Ind[tc.column]]->GetP();
+    }
     // Row(std::map<std::string_view, sssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
     //Row(std::map<std::string_view, sssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
-    std::vector<TableView::Row> data(rowAmt, TableView::Row(name2Ind, std::vector<void*> (colAmt)));
-    ssize_t curInd = 0;
+    //std::vector<TableView::Row> data(rowAmt, TableView::Row(name2Ind, std::vector<ssize_t> (colAmt)));
+    std::vector<ssize_t> inds;
+    inds.reserve(rowAmt);
+    //ssize_t curInd = 0;
     for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
         ssize_t ind = *it;
         if (!isFine[ind]) {
             continue;
         }
+        inds.emplace_back(ind);
         
-        ssize_t colInd = 0;
+        /*colInd = 0;
         for (const auto& tc : tcs) {
             if (tc.table != tName) {
                 continue;
             }
+            //data[curInd][colInd] = columns[name2Ind[tc.column]]->GetP(ind);
             data[curInd][colInd] = columns[name2Ind[tc.column]]->GetP(ind);
             colInd++;
         }
-        curInd++;
+        curInd++;*/
     }
-    auto res = TableView(name2Ind, data);
+    //auto res = TableView(name2Ind, data);
     //std::cout <<&data << ' ' << &res.columns << ' ' << &res.columns[0] << ' ' << &res.col2ind << ' ' << &name2Ind << std::endl;
-    return TableView(name2Ind, data);
+    return TableView(curCol2ind, inds, tableViewColumns);
 }
 
 }

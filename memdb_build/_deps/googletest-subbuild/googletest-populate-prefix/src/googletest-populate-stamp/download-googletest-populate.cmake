@@ -22,14 +22,14 @@ function(check_file_hash has_hash hash_is_good)
   set("${has_hash}" TRUE PARENT_SCOPE)
 
   message(STATUS "verifying file...
-       file='/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'")
+       file='/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'")
 
-  file("" "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip" actual_value)
+  file("" "/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip" actual_value)
 
   if(NOT "${actual_value}" STREQUAL "")
     set("${hash_is_good}" FALSE PARENT_SCOPE)
     message(STATUS " hash of
-    /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip
+    /home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip
   does not match expected value
     expected: ''
       actual: '${actual_value}'")
@@ -71,7 +71,7 @@ function(sleep_before_download attempt)
   execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep "${sleep_seconds}")
 endfunction()
 
-if("/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip" STREQUAL "")
+if("/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip" STREQUAL "")
   message(FATAL_ERROR "LOCAL can't be empty")
 endif()
 
@@ -79,32 +79,32 @@ if("https://github.com/google/googletest/archive/f8d7d77c06936315286eb55f8de22cd
   message(FATAL_ERROR "REMOTE can't be empty")
 endif()
 
-if(EXISTS "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
+if(EXISTS "/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
   check_file_hash(has_hash hash_is_good)
   if(has_hash)
     if(hash_is_good)
       message(STATUS "File already exists and hash match (skip download):
-  file='/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'
+  file='/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'
   =''"
       )
       return()
     else()
       message(STATUS "File already exists but hash mismatch. Removing...")
-      file(REMOVE "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
+      file(REMOVE "/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
     endif()
   else()
     message(STATUS "File already exists but no hash specified (use URL_HASH):
-  file='/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'
+  file='/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'
 Old file will be removed and new file downloaded from URL."
     )
-    file(REMOVE "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
+    file(REMOVE "/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
   endif()
 endif()
 
 set(retry_number 5)
 
 message(STATUS "Downloading...
-   dst='/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'
+   dst='/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip'
    timeout='none'
    inactivity timeout='none'"
 )
@@ -126,7 +126,7 @@ foreach(i RANGE ${retry_number})
 
       file(
         DOWNLOAD
-        "${url}" "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip"
+        "${url}" "/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip"
         SHOW_PROGRESS
         # no TIMEOUT
         # no INACTIVITY_TIMEOUT
@@ -143,7 +143,7 @@ foreach(i RANGE ${retry_number})
         check_file_hash(has_hash hash_is_good)
         if(has_hash AND NOT hash_is_good)
           message(STATUS "Hash mismatch, removing...")
-          file(REMOVE "/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
+          file(REMOVE "/home/leha/Desktop/memdb/memdb/memdb_build/_deps/googletest-subbuild/googletest-populate-prefix/src/f8d7d77c06936315286eb55f8de22cd23c188571.zip")
         else()
           message(STATUS "Downloading... done")
           return()

@@ -48,19 +48,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.28.3/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -E rm -f
+RM = /usr/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/lehatrutenb/Desktop/prog/memdb
+CMAKE_SOURCE_DIR = /home/leha/Desktop/memdb/memdb
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/lehatrutenb/Desktop/prog/memdb/memdb_build
+CMAKE_BINARY_DIR = /home/leha/Desktop/memdb/memdb/memdb_build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /Users/lehatrutenb/Desktop/prog/memdb/memdb_build
 # Special rule for the target test
 test:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/ctest --force-new-ctest-process $(ARGS)
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
 .PHONY : test
 
 # Special rule for the target test
@@ -77,8 +77,8 @@ test/fast: test
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -88,7 +88,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake to regenerate build system..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -107,49 +107,49 @@ list_install_components/fast: list_install_components
 # Special rule for the target install
 install: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -P cmake_install.cmake
+	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install
 
 # Special rule for the target install
 install/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -P cmake_install.cmake
+	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local
 
 # Special rule for the target install/local
 install/local/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip
 
 # Special rule for the target install/strip
 install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
-	/opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase//CMakeFiles/progress.marks
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles 0
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase//CMakeFiles/progress.marks
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/clean
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/clean
 .PHONY : clean
 
 # The main clean target
@@ -158,22 +158,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/preinstall
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/preinstall
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule
 
 # Convenience name for target.
@@ -182,12 +182,12 @@ Memdb_db: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/rule
 
 # fast build rule for target.
 Memdb_db/fast:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build
 .PHONY : Memdb_db/fast
 
 # Convenience name for target.
 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
 
 # Convenience name for target.
@@ -196,7 +196,7 @@ Memdb_dbTest: memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/rule
 
 # fast build rule for target.
 Memdb_dbTest/fast:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build
 .PHONY : Memdb_dbTest/fast
 
 db.o: db.cpp.o
@@ -204,7 +204,7 @@ db.o: db.cpp.o
 
 # target to build an object file
 db.cpp.o:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o
 .PHONY : db.cpp.o
 
 db.i: db.cpp.i
@@ -212,7 +212,7 @@ db.i: db.cpp.i
 
 # target to preprocess a source file
 db.cpp.i:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.i
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.i
 .PHONY : db.cpp.i
 
 db.s: db.cpp.s
@@ -220,7 +220,7 @@ db.s: db.cpp.s
 
 # target to generate assembly for a file
 db.cpp.s:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.s
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.s
 .PHONY : db.cpp.s
 
 test.o: test.cpp.o
@@ -228,7 +228,7 @@ test.o: test.cpp.o
 
 # target to build an object file
 test.cpp.o:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.o
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.o
 .PHONY : test.cpp.o
 
 test.i: test.cpp.i
@@ -236,7 +236,7 @@ test.i: test.cpp.i
 
 # target to preprocess a source file
 test.cpp.i:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.i
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.i
 .PHONY : test.cpp.i
 
 test.s: test.cpp.s
@@ -244,7 +244,7 @@ test.s: test.cpp.s
 
 # target to generate assembly for a file
 test.cpp.s:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.s
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(MAKE) $(MAKESILENT) -f memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/build.make memdb/internal/dataBase/CMakeFiles/Memdb_dbTest.dir/test.cpp.s
 .PHONY : test.cpp.s
 
 # Help Target
@@ -279,6 +279,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

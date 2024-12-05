@@ -35,7 +35,9 @@ bool IsNonDefCmpOp(Operation op) {
 Type DbTypeEmpty::getType() {
     return Type::Empty;
 }
-std::shared_ptr<DbType> DbTypeEmpty::Copy() {};
+std::shared_ptr<DbType> DbTypeEmpty::Copy() {
+    return  {};
+};
 
 
 

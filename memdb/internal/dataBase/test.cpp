@@ -40,8 +40,6 @@ TEST(CheckCreateEmptyNameTable, 2) {
     db.CreateTable(tName, colDescripts);
 }
 
-//EXPECT_ANY_THROW(db.Insert("col_same", to_add));
-
 TEST(CheckCreateTable, 3) {
     Database db;
     std::string_view req = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
@@ -82,7 +80,7 @@ TEST(SmokeCheckInsert, 0) {
     Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
     std::string_view req2 = R"(insert (,"vasya", 0xdeadbeefdeadbeef,) to users)";
-    std::string_view req3 = R"(insert (id=6,login = "vasya", password_hash = 0xdeadbeefdeadbeef, is_admin=false) to users)";
+    std::string_view req3 = R"(insert (id=6,login = "vasya2", password_hash = 0xdeadbeefdeadbeef, is_admin=false) to users)";
     std::string_view req4 = R"(insert (,login = "petyapetya", password_hash = 0xdeadbeefdeadbeef,) to users)";
     std::string_view req5 = R"(insert (10,"admin", 0x0000000000000000, true) to users)";
 
@@ -130,13 +128,14 @@ TEST(ErrParseCheckInsert, 0) {
     std::string_view req3 = R"(insert (,,,id=10,login = "name2") to users)";
     std::string_view req4 = R"(insert (id=10,12,11,"name3") to users)";
     std::string_view req5 = R"(insert ("10",12,11,"name4") to users)";
-    std::string_view req6 = R"(insert ("10",12,11,"name4") to users)";
+    std::string_view req6 = R"(insert (10,12,11,"name4") to users)";
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_ANY_THROW(db.Execute(req2));
     EXPECT_ANY_THROW(db.Execute(req3));
     EXPECT_ANY_THROW(db.Execute(req4));
     EXPECT_ANY_THROW(db.Execute(req5));
+    EXPECT_NO_THROW(db.Execute(req6));
     EXPECT_ANY_THROW(db.Execute(req6));
 }
 
@@ -155,13 +154,14 @@ TEST(CheckSelect, 0) {
     EXPECT_NO_THROW(db.Execute(req4));
     EXPECT_NO_THROW(db.Execute(req5));
     TableView res;
+    db.Execute(req6);
     EXPECT_NO_THROW(res = db.Execute(req6).value());
     int ind = 0;
     for (auto row : res) {
         ind++;
         EXPECT_EQ(row.Get<int32_t>("id"), 11);
-        EXPECT_EQ(row.Get<int32_t>("id2"), 10);
-        EXPECT_EQ(row.Get<int32_t>("id3"), 12);
+        EXPECT_ANY_THROW(row.Get<int32_t>("id2"));
+        EXPECT_EQ(row.Get<int32_t>("id3"), 1);
         EXPECT_EQ(row.Get<std::string>("login"), "name4");
     }
     EXPECT_EQ(ind, 1);
