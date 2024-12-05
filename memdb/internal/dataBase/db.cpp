@@ -22,6 +22,7 @@
 11. разрешено писать select col1 from table1 where ... вместо select table1.col1 from table1 where если табличка всего одна
 12. не очень понял почему в тестовых запросов опускали запятую в конце хотя в усл сказанно,что если не пишут поле, то хотя бы запятую оставляют - добавил
 13. допустимые символы названий колонок/таблиц: 1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwwertyuiopasdfghjklzxcvbnm@#$;_
+14. |0x12| = 2
 1. разрешить использовать оба типа при insert одновременно
 
 TODO check that user not try to get unknown cols in get
@@ -193,30 +194,17 @@ using namespace memdb;
 
 int main() {
    Database db;
-    std::string_view req1 = "create table users ({autoincrement} id : int32, {autoincrement} id2 : int32, id3 : int32=1, {unique} login: string[32])";
-    std::string_view req2 = R"(insert (,,,"name1") to users)";
-    std::string_view req3 = R"(insert (id=10,,,login = "name2") to users)";
-    std::string_view req4 = R"(insert (10,,11,"name3") to users)";
-    std::string_view req5 = R"(insert (,10,,"name4") to users)";
-    std::string_view req6 = R"(select id, id3, login from users where id=11)";
+    std::string_view req1 = "create table users ({autoincrement} id: int32, c1 : bytes[2], c2 : bytes[2], c3 : bytes[2])";
+    std::string_view req2 = R"(insert (,0x1234,0x12,0x34) to users)";
+    std::string_view req3 = R"(insert (,0x1,0x0,0x9) to users)";
+    std::string_view req4 = R"(insert (,0xabcd,0xefab,0x8) to users)";
+    std::string_view req6 = R"(select id from users where |c1| = 1)";
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_NO_THROW(db.Execute(req2));
     EXPECT_NO_THROW(db.Execute(req3));
     EXPECT_NO_THROW(db.Execute(req4));
-    EXPECT_NO_THROW(db.Execute(req5));
-    TableView res;
-    db.Execute(req6);
-    EXPECT_NO_THROW(res = db.Execute(req6).value());
-    int ind = 0;
-    for (auto row : res) {
-        ind++;
-        EXPECT_EQ(row.Get<int32_t>("id"), 11);
-        //EXPECT_ANY_THROW(row.Get<int32_t>("id2"));
-        EXPECT_EQ(row.Get<int32_t>("id3"), 1);
-        EXPECT_EQ(row.Get<std::string>("login"), "name4");
-    }
-    EXPECT_EQ(ind, 1);
+    EXPECT_NO_THROW(db.Execute(req6));
     return 0;
     /*Database db;
     std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";

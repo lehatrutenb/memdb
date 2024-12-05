@@ -149,12 +149,14 @@ std::shared_ptr<DbType> DbBytes::Copy() {
     return copy;
 }
 
-bool DbBytes::doOp(Operation op, const DbBytes* another) { // update cur
+int DbBytes::doOp(Operation op, const DbBytes* another) { // update cur
     switch (op) {
     case Operation::EQ:
         return x == another->x;
     case Operation::NOTEQ:
         return x != another->x;
+    case Operation::LEN:
+        return x.size() - 2; // 0x
     default:
         // throw ex - bad op
         throw std::runtime_error("error");
@@ -237,10 +239,10 @@ int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> rig
         }
         return dynamic_cast<DbBool*>(left.get())->doOp(op, dynamic_cast<DbBool*>(right.get()));
     case Type::Bytes:
-        return dynamic_cast<DbBytes*>(left.get())->doOp(op, dynamic_cast<DbBytes*>(right.get()));
+        return dynamic_cast<DbBytes*>(left.get())->doOp(op, nullptr);
     case Type::String:
         if (op == Operation::LEN) {
-                return dynamic_cast<DbString*>(left.get())->doOp(op, nullptr);
+            return dynamic_cast<DbString*>(left.get())->doOp(op, nullptr);
         }
         return dynamic_cast<DbString*>(left.get())->doOp(op, dynamic_cast<DbString*>(right.get()));
     default:

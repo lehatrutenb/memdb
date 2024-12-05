@@ -96,7 +96,7 @@ public:
 
     std::shared_ptr<DbType> Copy() override;
 
-    bool doOp(Operation op, const DbBytes* another);
+    int doOp(Operation op, const DbBytes* another);
 
     std::vector<char> x;
 };

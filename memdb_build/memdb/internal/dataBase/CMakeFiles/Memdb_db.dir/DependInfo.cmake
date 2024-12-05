@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/leha/Desktop/memdb/memdb/memdb/internal/dataBase/db.cpp" "memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o" "gcc" "memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o.d"
+  "/Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase/db.cpp" "memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o" "gcc" "memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

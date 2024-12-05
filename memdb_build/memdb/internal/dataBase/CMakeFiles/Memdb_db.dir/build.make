@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.28.3/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E rm -f
+RM = /opt/homebrew/Cellar/cmake/3.28.3/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/leha/Desktop/memdb/memdb
+CMAKE_SOURCE_DIR = /Users/lehatrutenb/Desktop/prog/memdb
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/leha/Desktop/memdb/memdb/memdb_build
+CMAKE_BINARY_DIR = /Users/lehatrutenb/Desktop/prog/memdb/memdb_build
 
 # Include any dependencies generated for this target.
 include memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/depend.make
@@ -70,18 +70,18 @@ include memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/progress.make
 include memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/flags.make
 
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/flags.make
-memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o: /home/leha/Desktop/memdb/memdb/memdb/internal/dataBase/db.cpp
+memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o: /Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase/db.cpp
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o"
-	cd /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o -MF CMakeFiles/Memdb_db.dir/db.cpp.o.d -o CMakeFiles/Memdb_db.dir/db.cpp.o -c /home/leha/Desktop/memdb/memdb/memdb/internal/dataBase/db.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o"
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o -MF CMakeFiles/Memdb_db.dir/db.cpp.o.d -o CMakeFiles/Memdb_db.dir/db.cpp.o -c /Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase/db.cpp
 
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Memdb_db.dir/db.cpp.i"
-	cd /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/leha/Desktop/memdb/memdb/memdb/internal/dataBase/db.cpp > CMakeFiles/Memdb_db.dir/db.cpp.i
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase/db.cpp > CMakeFiles/Memdb_db.dir/db.cpp.i
 
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Memdb_db.dir/db.cpp.s"
-	cd /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/leha/Desktop/memdb/memdb/memdb/internal/dataBase/db.cpp -o CMakeFiles/Memdb_db.dir/db.cpp.s
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase/db.cpp -o CMakeFiles/Memdb_db.dir/db.cpp.s
 
 # Object files for target Memdb_db
 Memdb_db_OBJECTS = \
@@ -93,19 +93,19 @@ Memdb_db_EXTERNAL_OBJECTS =
 memdb/internal/dataBase/libMemdb_db.a: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/db.cpp.o
 memdb/internal/dataBase/libMemdb_db.a: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build.make
 memdb/internal/dataBase/libMemdb_db.a: memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/leha/Desktop/memdb/memdb/memdb_build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libMemdb_db.a"
-	cd /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -P CMakeFiles/Memdb_db.dir/cmake_clean_target.cmake
-	cd /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Memdb_db.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/lehatrutenb/Desktop/prog/memdb/memdb_build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libMemdb_db.a"
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -P CMakeFiles/Memdb_db.dir/cmake_clean_target.cmake
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Memdb_db.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build: memdb/internal/dataBase/libMemdb_db.a
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/build
 
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/clean:
-	cd /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -P CMakeFiles/Memdb_db.dir/cmake_clean.cmake
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase && $(CMAKE_COMMAND) -P CMakeFiles/Memdb_db.dir/cmake_clean.cmake
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/clean
 
 memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/depend:
-	cd /home/leha/Desktop/memdb/memdb/memdb_build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/leha/Desktop/memdb/memdb /home/leha/Desktop/memdb/memdb/memdb/internal/dataBase /home/leha/Desktop/memdb/memdb/memdb_build /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase /home/leha/Desktop/memdb/memdb/memdb_build/memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /Users/lehatrutenb/Desktop/prog/memdb/memdb_build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/lehatrutenb/Desktop/prog/memdb /Users/lehatrutenb/Desktop/prog/memdb/memdb/internal/dataBase /Users/lehatrutenb/Desktop/prog/memdb/memdb_build /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase /Users/lehatrutenb/Desktop/prog/memdb/memdb_build/memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : memdb/internal/dataBase/CMakeFiles/Memdb_db.dir/depend
 
