@@ -193,107 +193,19 @@ using namespace memdb;
 
 
 int main() {
-   Database db;
-    std::string_view req1 = "create table users ({autoincrement} id: int32, c1 : bytes[2], c2 : bytes[2], c3 : bytes[2])";
-    std::string_view req2 = R"(insert (,0x1234,0x12,0x34) to users)";
-    std::string_view req3 = R"(insert (,0x1,0x0,0x9) to users)";
-    std::string_view req4 = R"(insert (,0xabcd,0xefab,0x8) to users)";
-    std::string_view req5 = R"(select id from users where c1 = 0x1234)";
-    std::string_view req6 = R"(select id from users where |c1| = 1)";
-    std::string_view req7 = R"(select id from users where c1 = 0xabcd && c2=0xefab)";
+    Database db;
+    std::string_view req1 = "create table users ({autoincrement} id: int32, c1 : int32, c2 : string[10], c3 : bytes[10], c4 : string[10])";
+    std::string_view req2 = R"(insert (,123, "456", 0x789, "101112") to users)";
+    std::string_view req3 = R"(insert (,123, "456", 0x789, "101112") to users)";
+    std::string_view req4 = R"(update users set c1=c1*10+|c2|,c2=c2+c2, c3=0x1, c4=c2+c4+"0" where id = 0)";
+    std::string_view req5 = R"(select id from users where c1=1233 && c2="456456" && c4="4561011120")";
+    std::string_view req6 = R"(select id from users where c1=123 && c2="456" && c4="101112")";
 
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_NO_THROW(db.Execute(req2));
     EXPECT_NO_THROW(db.Execute(req3));
     EXPECT_NO_THROW(db.Execute(req4));
-    EXPECT_NO_THROW(db.Execute(req5));
-    EXPECT_NO_THROW(db.Execute(req6));
-    EXPECT_NO_THROW(db.Execute(req7));
     return 0;
-    /*Database db;
-    std::string_view req1 = "create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)";
-    std::string_view req2 = R"(insert (,"vasya", 0xdeadbeefdeadbeef,) to users)";
-    std::string_view req3 = R"(insert (login = "vasya", password_hash = 0xdeadbeefdeadbeef) to users)";
-    std::string_view req3_2 = R"(insert (login = "petyapetya", password_hash = 0xdeadbeefdeadbeef) to users)";
-    std::string_view req4 = R"(insert (,"admin", 0x0000000000000000, true) to users)";
-    std::string_view req5 = R"(select id, login from users where is_admin)";
-    std::string_view req6 = R"(select id, login from users where is_admin || id < 10)";
-    std::string_view req7 = R"(update users set is_admin = true where login = "vasya")";
-    std::string_view req8 = R"(update users set login = login + "_deleted", is_admin = false where password_hash < 0x00000000ffffffff)";
-    //std::string_view req9 = R"(delete users where |login| % 2 = 0)";
-    std::string_view req9 = R"(delete users where login = "vasya")";
-    std::string_view req9_1 = R"(select id, login from users where login = "vasya")";
-
-    db.Execute(req1);
-    db.Execute(req2);
-    db.Execute(req3);
-    db.Execute(req3_2);
-    db.Execute(req4);
-    std::string_view reqselect = R"(select id, login, password_hash from users where id > 1 && |login| = |"petya" + "petya"|)";
-    auto res = db.Execute(reqselect).value();
-    for (auto row: res) {
-        std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-    }
-    return 0;
-
-    { // update test
-        {
-            auto res = db.Execute(req9_1).value();
-            for (auto row: res) {
-                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-            }
-        }
-        std::string_view req10 = R"(update users set login = login + "123" where password_hash = 0xdeadbeefdeadbeef)";
-        db.Execute(req10);
-        {
-            std::string_view req9_2 = R"(select id, login from users where login = "vasya123")";
-            auto res = db.Execute(req9_2).value();
-            for (auto row: res) {
-                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-            }
-        }
-    }
-
-    { // delete test
-        {
-            auto res = db.Execute(req9_1).value();
-            for (auto row: res) {
-                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-            }
-        }
-        db.Execute(req9);
-        {
-            auto res = db.Execute(req9_1).value();
-            for (auto row: res) {
-                std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-            }
-        }
-    }
-    /*db.Execute(req5);
-    for (auto row: db.Execute(req5).value()) {
-        std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-    }* /
-    
-    int x;
-    x = 1;
-
-    /*const std::string_view tName = "table1";
-    std::vector<ColumnType> colTps = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName, colTps, colDescripts);
-
-    const std::string_view tName2 = "table2";
-    std::vector<ColumnType> colTps2 = {ColumnType(Type::Int32)};
-    std::vector<ColumnDescription> colDescripts2 = {ColumnDescription({ColumnAttrs::Default}, "column1")};
-    db.CreateTable(tName2, colTps2, colDescripts);
-
-    std::shared_ptr<DbType> value{new DbInt32(123)};
-    std::vector<Table::Value> to_add = {Table::Value(value)};
-    db.Insert("table1", to_add);
-
-    std::shared_ptr<DbType> value2{new DbInt32(321)};
-    std::vector<Table::Value> to_add2 = {Table::Value(value2)};
-    db.Insert("table2", to_add);*/
 }
 #endif

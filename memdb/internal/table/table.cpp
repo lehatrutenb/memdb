@@ -191,6 +191,7 @@ ssize_t Table::where(parser::Condition& cond) {
         ssize_t ind = *it;
         for (auto& tc : need) {
             vals[tc] = columns[name2Ind[tc.column]]->Get(ind);
+            vals[TableColumn(std::pair<std::string, std::string>{"", tc.column})] = vals[tc]; // try to set if table wasn't spec
         }
         auto res = cond.Compute(vals);
         if (res->getType() != Type::Bool) {
@@ -225,6 +226,7 @@ void Table::Update(parser::Assignments& as, parser::Condition& condWh) {
             for (auto& tc : need[colAsInd]) {
                 tc.table = tName;
                 vals[colAsInd][tc] = columns[name2Ind[tc.column]]->Get(ind);
+                vals[colAsInd][TableColumn(std::pair<std::string, std::string>{"", tc.column})] = vals[colAsInd][tc]; // try to set if table wasn't spec
             }
         }
 

@@ -122,8 +122,7 @@ bool DbBool::doOp(Operation op, const DbBool* another) { // update cur
     case Operation::OR:
         return x || another->x;
     case Operation::NOT:
-        throw std::runtime_error("error UNIMPLEMENTED"); // TODO
-        exit(-1);
+        return !x;
     case Operation::XOR:
         return (x ^ another->x);
     default:
@@ -215,7 +214,8 @@ int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> rig
         exit(-1);
     }
 
-    if (left->getType() != Type::String && left->getType() != Type::Bytes && IsNonDefCmpOp(op)) {
+    //left->getType() != Type::String && left->getType() != Type::Bytes && left->getType() != Type::Bool
+    if (left->getType() == Type::Int32 && IsNonDefCmpOp(op)) {
         switch (op)
         {
         case Operation::EQ:

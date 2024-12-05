@@ -277,7 +277,7 @@ Condition ConditionParser::Parse(const std::vector<std::shared_ptr<Tokenizer::To
                     Operation curOp = dynamic_cast<const Tokenizer::OperationT*>(curTokens[i].get())->t;
                     if (Condition::hasPrior(curOp, pr)) {
                         if (curOp == Operation::NOT) {
-                            if (i + 1 >= curTokensNxt.size()) {
+                            if (i + 1 >= curTokens.size()) {
                                 // throw ex - not enough args per operation
                                 throw std::runtime_error("error");
                                 exit(-1);
@@ -287,6 +287,7 @@ Condition ConditionParser::Parse(const std::vector<std::shared_ptr<Tokenizer::To
                             Condition c = Parse(curTokensNxt, curTokensNxt.size() - 1, curTokensNxt.size() - 1);
                             curTokensNxt.pop_back();
                             curTokensNxt.emplace_back(Tokenizer::getSharedToken<ConditionT>(new ConditionT(Condition(curOp, std::make_shared<Condition>(c), {}))));
+                            continue;
                         }
                         if (i + 1 >= curTokens.size() || curTokensNxt.empty()) {
                             // throw ex - not enough args per operation

@@ -376,7 +376,7 @@ TEST(CheckSelectBool, 0) {
         {req6, {1}},
         {req7, {0,2}},
         {req8, {0,2}},
-        {req9, {0}},
+        {req9, {0, 2}},
     };
 
     EXPECT_NO_THROW(db.Execute(req1));
@@ -404,7 +404,7 @@ TEST(CheckDelete, 0) {
     std::string_view req2 = R"(insert (,0, 1) to users)";
     std::string_view req3 = R"(insert (,1, 2) to users)";
     std::string_view req4 = R"(insert (,0, 2) to users)";
-    std::string_view req5 = R"(delete users where id = 0")";
+    std::string_view req5 = R"(delete users where id = 0)";
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_NO_THROW(db.Execute(req2));
@@ -424,6 +424,7 @@ TEST(CheckDelete, 1) {
 
     EXPECT_NO_THROW(db.Execute(req1));
     EXPECT_NO_THROW(db.Execute(req2));
+    EXPECT_NO_THROW(db.Execute(req3));
     EXPECT_NO_THROW(db.Execute(req4));
     EXPECT_NO_THROW(db.Execute(req5));
 
@@ -433,17 +434,14 @@ TEST(CheckDelete, 1) {
     for (auto row : res) {
         ind++;
         std::vector<int32_t> got = {row.Get<int32_t>("c1"), row.Get<int32_t>("c2")};
-        if (row.Get<int32_t>("id") == 0) {
-            EXPECT_EQ(got[0], 0);
-            EXPECT_EQ(got[1], 1);
-        } else if (row.Get<int32_t>("id") == 2) {
+        if (row.Get<int32_t>("id") == 2) {
             EXPECT_EQ(got[0], 2);
             EXPECT_EQ(got[1], 2);
         } else {
             EXPECT_EQ(row.Get<int32_t>("id"), -1); // or 2  doesn't matter - just throw err
         }
     }
-    EXPECT_EQ(ind, 2);
+    EXPECT_EQ(ind, 1);
 }
 
 TEST(CheckUpdate, 0) {
