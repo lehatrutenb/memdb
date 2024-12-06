@@ -1,4 +1,3 @@
-#pragma once
 #include <string_view>
 #include <string>
 #include <algorithm>
@@ -152,8 +151,8 @@ Tokenizer::CommandT::CommandT(lexer::Command t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::CommandT::GetType() const {
     return Tokenizer::TokenT::COMMAND;
 }
-bool Tokenizer::CommandT::Parse(std::vector<std::string>& inp, int& ind) {
-    auto res = lexer::IsCommand(inp, ind);
+bool Tokenizer::CommandT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) {
+    auto res = lexer::IsCommand(inpLowered, ind);
     if (res.first) {
         t = res.second;
         ind++;
@@ -172,8 +171,8 @@ Tokenizer::SubCommandT::SubCommandT(lexer::SubCommand t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::SubCommandT::GetType() const {
     return Tokenizer::TokenT::SUBCOMMAND;
 }
-bool Tokenizer::SubCommandT::Parse(std::vector<std::string>& inp, int& ind) {
-    auto res = lexer::IsSubCommand(inp, ind);
+bool Tokenizer::SubCommandT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) {
+    auto res = lexer::IsSubCommand(inpLowered, ind);
     if (res.first) {
         t = res.second;
         ind++;
@@ -194,8 +193,8 @@ Tokenizer::AttributeT::AttributeT(lexer::Attribute t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::AttributeT::GetType() const {
     return Tokenizer::TokenT::ATTRIBUTE;
 }
-bool Tokenizer::AttributeT::Parse(std::vector<std::string>& inp, int& ind) {
-    auto res = lexer::IsAttribute(inp, ind);
+bool Tokenizer::AttributeT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) {
+    auto res = lexer::IsAttribute(inpLowered, ind);
     if (res.first) {
         t = res.second;
         ind++;
@@ -216,8 +215,8 @@ Tokenizer::OtherT::OtherT(lexer::Other t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::OtherT::GetType() const  {
     return Tokenizer::TokenT::OTHER;
 }
-bool Tokenizer::OtherT::Parse(std::vector<std::string>& inp, int& ind)  {
-    auto res = lexer::IsOther(inp, ind);
+bool Tokenizer::OtherT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind)  {
+    auto res = lexer::IsOther(inpLowered, ind);
     if (res.first) {
         t = res.second;
         ind++;
@@ -237,7 +236,7 @@ Tokenizer::OperationT::OperationT(Operation t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::OperationT::GetType() const  {
     return Tokenizer::TokenT::OPERATION;
 }
-bool Tokenizer::OperationT::Parse(std::vector<std::string>& inp, int& ind)  {
+bool Tokenizer::OperationT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind)  {
     auto res = lexer::IsOperation(inp, ind);
     if (res.first) {
         t = res.second;
@@ -259,7 +258,7 @@ Tokenizer::BracketT::BracketT(lexer::Bracket t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::BracketT::GetType() const  {
     return Tokenizer::TokenT::BRACKET;
 }
-bool Tokenizer::BracketT::Parse(std::vector<std::string>& inp, int& ind)  {
+bool Tokenizer::BracketT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind)  {
     auto res = lexer::IsBracket(inp, ind);
     if (res.first) {
         t = res.second;
@@ -280,8 +279,8 @@ Tokenizer::ColumnTypeT::ColumnTypeT(ColumnType t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::ColumnTypeT::GetType() const  {
     return Tokenizer::TokenT::COLUMNTYPE;
 }
-bool Tokenizer::ColumnTypeT::Parse(std::vector<std::string>& inp, int& ind)  {
-    auto res = lexer::IsColumnType(inp, ind);
+bool Tokenizer::ColumnTypeT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind)  {
+    auto res = lexer::IsColumnType(inpLowered, ind);
     if (res.first) {
         t = res.second;
         ind++;
@@ -305,7 +304,7 @@ Tokenizer::DBTypeT::DBTypeT(std::shared_ptr<DbType> t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::DBTypeT::GetType() const  {
     return Tokenizer::TokenT::DBTYPE;
 }
-bool Tokenizer::DBTypeT::Parse(std::vector<std::string>& inp, int& ind)  {
+bool Tokenizer::DBTypeT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind)  {
     {
         auto res = lexer::IsString(inp, ind);
         if (res.first) {
@@ -357,7 +356,7 @@ Tokenizer::StringT::StringT(std::string t_) : t(t_){};
 Tokenizer::TokenT Tokenizer::StringT::GetType() const  {
     return Tokenizer::TokenT::STRING;
 }
-bool Tokenizer::StringT::Parse(std::vector<std::string>& inp, int& ind)  {
+bool Tokenizer::StringT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind)  {
     t = inp[ind];
     ind++;
     return true;
@@ -370,10 +369,18 @@ std::shared_ptr<Tokenizer::Token> Tokenizer::StringT::Copy()  {
 
 
 std::vector<std::shared_ptr<Tokenizer::Token>> Tokenizer::Tokenize(std::vector<std::string> inp, int ind) {
+    std::vector<std::string> inpLowered;
+    inpLowered.reserve(inp.size());
+    for (std::string s: inp) {
+        for (char& ch : s) {
+            ch = tolower(ch);
+        }
+        inpLowered.emplace_back(s);
+    }
     std::vector<std::shared_ptr<Tokenizer::Token>> tokens;
     while (ind < inp.size()) {
         for (std::shared_ptr<Tokenizer::Token> t : tokenSeq) { // don't already want copy? TODO check
-            if (t->Parse(inp, ind)) {
+            if (t->Parse(inp, inpLowered, ind)) {
                 tokens.push_back(t->Copy());
                 break;
             }

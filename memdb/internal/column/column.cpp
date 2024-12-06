@@ -79,6 +79,14 @@ ssize_t ColumnString::push(std::shared_ptr<DbType> x) {
     return -1;
 }
 
+void ColumnString::update(ssize_t ind, std::shared_ptr<DbType> x) {
+    if (baseColT::columnT.maxLength >= getValue<DbString, std::string>(x).size()) {
+        return baseColT::update(ind, x);
+    }
+    // throw ex got too large string
+    throw std::runtime_error("error");
+}
+
 ColumnBytes::ColumnBytes(const ColumnFullDescription& descr) : ColumnBase<std::vector<char>, DbBytes>(descr) {}
 ssize_t ColumnBytes::push(std::shared_ptr<DbType> x)  {
     if (baseColT::columnT.maxLength * 2 + 2 >= getValue<DbBytes, std::vector<char>>(x).size()) { // + 2 eq to 0x
@@ -87,5 +95,12 @@ ssize_t ColumnBytes::push(std::shared_ptr<DbType> x)  {
     // throw ex got too large byte arr
     throw std::runtime_error("error");
     return -1;
+}
+void ColumnBytes::update(ssize_t ind, std::shared_ptr<DbType> x)  {
+    if (baseColT::columnT.maxLength * 2 + 2 >= getValue<DbBytes, std::vector<char>>(x).size()) { // + 2 eq to 0x
+        return baseColT::update(ind, x);
+    }
+    // throw ex got too large byte arr
+    throw std::runtime_error("error");
 }
 }

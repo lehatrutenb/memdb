@@ -1,4 +1,3 @@
-#pragma once
 #include <string_view>
 #include <map>
 #include "db.hpp"
@@ -206,6 +205,8 @@ int main() {
     EXPECT_NO_THROW(db.Execute(req2));
     EXPECT_NO_THROW(db.Execute(req3));
     EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
+    EXPECT_NO_THROW(db.Execute(req6));
     return 0;
 }
 #endif

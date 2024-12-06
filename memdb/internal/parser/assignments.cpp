@@ -1,4 +1,3 @@
-#pragma once
 #include <string_view>
 #include <string>
 #include <vector>
@@ -51,7 +50,6 @@ Assignments AssignmentsParser::Parse(const std::vector<std::shared_ptr<Tokenizer
         int commaInd = getNextToken<Tokenizer::OtherT, lexer::Other>(inp, l + 2, r, Tokenizer::TokenT::OTHER, lexer::Other::COMMA);
         if (commaInd == -1) {
             commaInd = r + 1;
-            break;
         }
 
         Condition cond = parser::ConditionParser{}.Parse(inp, l + 2, commaInd - 1);

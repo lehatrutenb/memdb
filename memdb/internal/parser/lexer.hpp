@@ -137,7 +137,7 @@ enum class TokenT {
 struct Token {
     virtual TokenT GetType() const = 0;
     virtual std::shared_ptr<Token> Copy()=0;
-    virtual bool Parse(std::vector<std::string>& inp, int& ind) = 0;
+    virtual bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) = 0;
 };
 
 template<typename T>
@@ -157,7 +157,7 @@ struct CommandT : public Token {
     CommandT();
     CommandT(lexer::Command t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 
@@ -169,7 +169,7 @@ struct SubCommandT : public Token {
     SubCommandT();
     SubCommandT(lexer::SubCommand t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 
@@ -181,7 +181,7 @@ struct AttributeT : public Token {
     AttributeT();
     AttributeT(lexer::Attribute t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 
@@ -193,7 +193,7 @@ struct OtherT : public Token {
     OtherT();
     OtherT(lexer::Other t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
     lexer::Other t;
@@ -205,7 +205,7 @@ struct OperationT : public Token {
     OperationT();
     OperationT(Operation t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 
@@ -217,7 +217,7 @@ struct BracketT : public Token {
     BracketT();
     BracketT(lexer::Bracket t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 
@@ -229,7 +229,7 @@ struct ColumnTypeT : public Token {
     ColumnTypeT();
     ColumnTypeT(ColumnType t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 
@@ -241,7 +241,7 @@ struct DBTypeT : public Token {
     DBTypeT();
     DBTypeT(std::shared_ptr<DbType> t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
     std::shared_ptr<DbType> t;
@@ -252,7 +252,7 @@ struct StringT : public Token {
     StringT();
     StringT(std::string t_);
     TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
     std::shared_ptr<Token> Copy() override;
 

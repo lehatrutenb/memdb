@@ -1,4 +1,3 @@
-#pragma once
 #include "gtest/gtest.h"
 
 #include <cstdio>
@@ -446,12 +445,12 @@ TEST(CheckDelete, 1) {
 
 TEST(CheckUpdate, 0) {
     Database db;
-    std::string_view req1 = "create table users ({autoincrement} id: int32, c1 : int32, c2 : string[10], c3 : bytes[10], c4 : string[10])";
+    std::string_view req1 = "create table users ({autoincrement} id: int32, c1 : int32, c2 : string[10], c3 : bytes[10], c4 : string[20])";
     std::string_view req2 = R"(insert (,123, "456", 0x789, "101112") to users)";
     std::string_view req3 = R"(insert (,123, "456", 0x789, "101112") to users)";
     std::string_view req4 = R"(update users set c1=c1*10+|c2|,c2=c2+c2, c3=0x1, c4=c2+c4+"0" where id = 0)";
-    std::string_view req5 = R"(select id from users where c1=1233 && c2="456456" && c4="4561011120")";
-    std::string_view req6 = R"(select id from users where c1=123 && c2="456" && c4="101112")";
+    std::string_view req5 = R"(select id from users where c1=1233 && c2="456456" && c3=0x1 && c4="4561011120")";
+    std::string_view req6 = R"(select id from users where c1=123 && c2="456" && c3=0x789 && c4="101112")";
 
     
     std::vector<Request> reqs = {
@@ -476,6 +475,25 @@ TEST(CheckUpdate, 0) {
         }
         EXPECT_EQ(sorted(colRes), req.exp);
     }
+}
+
+TEST(CheckRegister, 0) {
+    Database db;
+    std::string_view req1 = "CrEate TaBlE users ({autoiNcrement} id: inT32, c1 : iNt32, c2 : String[10], c3 : bYtes[10], c4 : strIng[20])";
+    std::string_view req2 = R"(iNsert (,123, "456", 0x789, "101112") tO users)";
+    std::string_view req3 = R"(insErt (,123, "456", 0x789, "101112") To users)";
+    std::string_view req4 = R"(uPdate users sEt c1=c1*10+|c2|,c2=c2+c2, c3=0x1, c4=c2+c4+"0" wheRe id = 0)";
+    std::string_view req5 = R"(sElect id froM users wHere c1=1233 && c2="456456" && c3=0x1 && c4="4561011120")";
+    std::string_view req6 = R"(seleCt id From users Where c1=123 && c2="456" && c3=0x789 && c4="101112")";
+    std::string_view req7 = R"(dElete users whEre id = 0)";
+
+    EXPECT_NO_THROW(db.Execute(req1));
+    EXPECT_NO_THROW(db.Execute(req2));
+    EXPECT_NO_THROW(db.Execute(req3));
+    EXPECT_NO_THROW(db.Execute(req4));
+    EXPECT_NO_THROW(db.Execute(req5));
+    EXPECT_NO_THROW(db.Execute(req6));
+    EXPECT_NO_THROW(db.Execute(req7));
 }
 
 int main(int argc, char **argv) {

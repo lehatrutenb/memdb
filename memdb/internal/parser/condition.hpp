@@ -75,9 +75,9 @@ struct ConditionT : public Tokenizer::Token {
     ConditionT() {};
     ConditionT(Condition t_);
     Tokenizer::TokenT GetType() const override;
-    bool Parse(std::vector<std::string>& inp, int& ind) override;
+    bool Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) override;
 
-    std::shared_ptr<Token> Copy();
+    std::shared_ptr<Token> Copy() override;
 
     Condition t;
 };

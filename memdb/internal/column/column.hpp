@@ -112,7 +112,7 @@ friend ColumnBytes;
         cur.del(ind);
     }
 
-    void update(ssize_t ind, std::shared_ptr<DbType> x) override {
+    virtual void update(ssize_t ind, std::shared_ptr<DbType> x) override {
         T x_ = dynamic_cast<DbT*>(x.get())->get();
         cur.update(ind, x_);
     }
@@ -178,11 +178,13 @@ struct ColumnString : public ColumnBase<std::string, DbString> {
     using baseColT = ColumnBase<std::string, DbString>;
     ColumnString(const ColumnFullDescription& descr);
     virtual ssize_t push(std::shared_ptr<DbType> x) override;
+    virtual void update(ssize_t ind, std::shared_ptr<DbType> x) override;
 };
 
 struct ColumnBytes : public ColumnBase<std::vector<char>, DbBytes> {
     using baseColT = ColumnBase<std::vector<char>, DbBytes>;
     ColumnBytes(const ColumnFullDescription& descr);
     virtual ssize_t push(std::shared_ptr<DbType> x) override;
+    virtual void update(ssize_t ind, std::shared_ptr<DbType> x) override;
 };
 }

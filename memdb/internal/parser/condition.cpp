@@ -1,4 +1,3 @@
-#pragma once
 #include <string_view>
 #include <string>
 #include <vector>
@@ -190,7 +189,7 @@ ConditionT::ConditionT(Condition t_) : t(t_){};
 Tokenizer::TokenT ConditionT::GetType() const {
     return Tokenizer::TokenT::CONDITION;
 }
-bool ConditionT::Parse(std::vector<std::string>& inp, int& ind) {
+bool ConditionT::Parse(std::vector<std::string>& inp, std::vector<std::string>& inpLowered, int& ind) {
     // throw ex - unexp call
     throw std::runtime_error("error");
     exit(-1);

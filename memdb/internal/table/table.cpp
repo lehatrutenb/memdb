@@ -1,4 +1,3 @@
-#pragma once
 #include "table.hpp"
 #include <map>
 #include <string_view>
@@ -73,18 +72,6 @@ void Table::AddColumn(const ColumnFullDescription& descr) { // nullptr
         std::shared_ptr<Column> tm{new ColumnBytes(descr)};
         newCol.swap(tm);
     }
-    /*switch (colTp.t) {
-    case Type::Int32:
-        std::shared_ptr<Column> tm{new ColumnInt32(descr)};
-        newCol.swap(tm);
-        break;
-    /*case Type::Bool:
-        newCol = std::make_shared<Column>(ColumnBool(tps, name, defVal));
-        break;* /
-    default:
-        exit(-1); // throw exc
-        break;
-    }*/
     name2Ind[descr.name] = columns.size();
     columns.emplace_back(newCol);
 }
@@ -231,7 +218,13 @@ void Table::Update(parser::Assignments& as, parser::Condition& condWh) {
         }
 
         for (int colAsInd = 0; colAsInd < need.size(); colAsInd++) {
-            columns[ind]->update(ind, as.As[colAsInd].Exp.Compute(vals[colAsInd]));
+            auto tableColInd = name2Ind.find(as.As[colAsInd].TableColNames.second);
+            if (tableColInd == name2Ind.end()) {
+                // unexpected column name in update
+                throw std::runtime_error("error");
+                exit(-1);
+            }
+            columns[tableColInd->second]->update(ind, as.As[colAsInd].Exp.Compute(vals[colAsInd]));
         }
     }
 }
