@@ -12,36 +12,6 @@
 #include "selectValues.hpp"
 #include <iostream>
 
-//#include "objects.cpp"
-/*
-create table users ({key, autoincrement} id : int32, {unique} login: string[32], password_hash: bytes[8], is_admin: bool = false)
-
-
-
-insert (,"vasya", 0xdeadbeefdeadbeef) to users
-insert (login = "vasya", password_hash = 0xdeadbeefdeadbeef) to users
-insert (,"admin", 0x0000000000000000, true) to users
-insert (
-         is_admin = true,
-         login = "admin",
-         password_hash = 0x0000000000000000
-     ) to users
-
-
-select id, login from users where is_admin || id < 10
-
-update users set is_admin = true where login = "vasya"
-update users set login = login + "_deleted", is_admin = false where password_hash < 0x00000000ffffffff
-
-delete users where |login| % 2 = 0
-
-select posts.id, users.login, posts.text from users join posts on users.id = posts.user_id where true
-select posts.id, users.login, posts.text from users join posts on users.id = posts.user_id
-
-create ordered index on users by login
-create unordered index on users by is_admin
-*/
-
 namespace memdb {
 namespace parser {
 
@@ -135,9 +105,6 @@ public:
 
 
     parser::TokenStructure Parse(const std::string_view& preS, ssize_t l, ssize_t r);
-
-    //std::pair<bool, std::pair<std::string, parser::ColumnDescriptions>> ParseCreate(const std::string_view& preS, ssize_t l, ssize_t r);
-    //std::pair<bool, std::pair<std::string, parser::InsertData>> ParseInsert(const std::string_view& preS, ssize_t l, ssize_t r);
 };
 
 }

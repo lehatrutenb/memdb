@@ -26,8 +26,6 @@ struct TableView {
             return static_cast<DbType_s<T>*>(rcolPs[rcol2ind[colName]])->get(ind);
         }
 
-        //void*& operator[](ssize_t ind); what for?
-
         private:
             std::map<std::string, ssize_t> rcol2ind;
             std::vector<Column::ColumnStructP> rcolPs;

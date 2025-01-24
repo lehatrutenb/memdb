@@ -49,11 +49,6 @@ std::shared_ptr<DbType> Condition::getLeafVal(std::map<TableColumn, std::shared_
 
 std::shared_ptr<DbType> Condition::Compute(std::map<TableColumn, std::shared_ptr<DbType>>& vals) const {
     if (isLeaf) {
-        /*if (!leaf->hasVal) {
-            // throw ex - val should be on that moment
-            exit(-1);
-        }
-        return leaf->val;*/
         return getLeafVal(vals);
     }
 
@@ -117,34 +112,6 @@ std::shared_ptr<DbType> Condition::Compute(std::map<TableColumn, std::shared_ptr
     // throw ex - unexp op
     throw std::runtime_error("error");
     exit(-1);
-
-    /*std::shared_ptr<DbType> resLeft, resRight;
-    if (left) {
-        resLeft = left->Compute();
-    }
-    if (right) {
-        resRight = right->Compute();
-    }
-
-    if (!left) {
-        swap(resLeft, resRight);
-    }
-    if (left && right) {
-        int res = DbType::DoOp(Op, left->leaf->val, right->leaf->val);
-        if (IsMathOp(Op)) {
-            return left->leaf->val;
-        } else if (Op != Operation::LEN) {
-            std::shared_ptr<DbType> resObj;
-            resObj.reset(dynamic_cast<DbType*>(new DbBool(res)));
-            return resObj;
-        } else {
-            std::shared_ptr<DbType> resObj;
-            resObj.reset(dynamic_cast<DbType*>(new DbInt32(res)));
-            return resObj;
-        }
-    } else {
-        return resLeft;
-    }*/
 }
 
 bool Condition::hasPrior(Operation op, int i) {
@@ -184,7 +151,6 @@ void Object::readk(const std::vector<std::string_view>& inp, int& ind, int k) {
 }
 
 
-//ConditionT::ConditionT() {};
 ConditionT::ConditionT(Condition t_) : t(t_){};
 Tokenizer::TokenT ConditionT::GetType() const {
     return Tokenizer::TokenT::CONDITION;

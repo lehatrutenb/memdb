@@ -213,7 +213,6 @@ int DoOp(Operation op, std::shared_ptr<DbType> left, std::shared_ptr<DbType> rig
         exit(-1);
     }
 
-    //left->getType() != Type::String && left->getType() != Type::Bytes && left->getType() != Type::Bool
     if (left->getType() == Type::Int32 && IsNonDefCmpOp(op)) {
         switch (op)
         {

@@ -11,8 +11,6 @@ if (NOT SetDebugBuildType)
     add_compile_options(-O2)
 endif()
 
-#add_executable(Memdb memdb/internal/dataBase/db.cpp)
-
 include(FetchContent)
 FetchContent_Declare(
     googletest

@@ -1,9 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     '/Users/lehatrutenb/Desktop/prog/empty/main'
-relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: __Z5solvev, symObjAddr: 0x0, symBinAddr: 0x100003E78, symSize: 0x4 }
-  - { offsetInCU: 0x6974, offset: 0x6974, size: 0x8, addend: 0x0, symName: __Z5solvev, symObjAddr: 0x0, symBinAddr: 0x100003E78, symSize: 0x4 }
-  - { offsetInCU: 0x698D, offset: 0x698D, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x4, symBinAddr: 0x100003E7C, symSize: 0xBC }
-  - { offsetInCU: 0x6A4E, offset: 0x6A4E, size: 0x8, addend: 0x0, symName: __ZNSt3__19basic_iosIcNS_11char_traitsIcEEE3tieB8ue170006EPNS_13basic_ostreamIcS2_EE, symObjAddr: 0xC0, symBinAddr: 0x100003F38, symSize: 0x2C }
-...

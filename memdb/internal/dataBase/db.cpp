@@ -3,39 +3,6 @@
 #include "db.hpp"
 #include <stdexcept>
 
-/*
-доп ограничения/ доп возможности:
-1. Join надо обернуть в скобки
-2. Если есть join то писать обязательно on
-3. Update c join не будет ?
-4. в condition можно делать строить логические последовательности так, чтобы колонки не зависили друг от друга - можно исправить изначально меняя inds в 
-    соотвествии с такими сложными условиями
-5. названия таблиц и колоннок не начинаются с цифр
-6. -1 и подобные числа с однооперандным -/+ не парсятся
-7. символы названий таблиц/колонок: isdigit(ch) || isalpha(ch) || ch == '.' || ch == '"' || ch == '_' || ch == '#' || ch == '@'
-8. |"asdsa" + "adas" + "a"| разрешено
-9. решил не забирать возможность - condition (where) можно с и составить так, что если колонки никогда не будут нужны, то туда можно писать некорректные
-9.1 чтобы убрать - добавить if в computecondition
-10. колонкам разрешено меняться в зависимости от других колонок этой же таблички и изм будут как 1 тразакция (a = "1" b = "2" a = a+b, b =b+a -> a=12 b = 21)
-что можно легко добавить:
-11. разрешено писать select col1 from table1 where ... вместо select table1.col1 from table1 where если табличка всего одна
-12. не очень понял почему в тестовых запросов опускали запятую в конце хотя в усл сказанно,что если не пишут поле, то хотя бы запятую оставляют - добавил
-13. допустимые символы названий колонок/таблиц: 1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwwertyuiopasdfghjklzxcvbnm@#$;_
-14. |0x12| = 2
-1. разрешить использовать оба типа при insert одновременно
-
-TODO check that user not try to get unknown cols in get
-TODO rm + op from bytes
-TODO check || for str bytes
-TODO autoincrement - check that type ios int
-TODO add tolower
-TODO autoincrement - check that type ios int
-add work with attrs
-how not opperation will work? - test
-add work with attrs
-how not opperation will work? - test
-*/
-
 namespace memdb {
 
 void Database::CreateTable(const std::string& tName, const std::vector<ColumnFullDescription>& colDescripts) {
@@ -46,12 +13,9 @@ void Database::CreateTable(const std::string& tName, const std::vector<ColumnFul
     }
     tName2ind[tName] = tables.size();
     tables.emplace_back(Table{tName});
-    //colTps.push_back({});
-    //colTps.back().resize(colDescripts.size());
 
     for (int i = 0; i < colDescripts.size(); i++) {
         tables.back().AddColumn(colDescripts[i]);
-        //colTps.back()[i] = colDescripts[i];
     }
 }
 
@@ -89,9 +53,6 @@ std::optional<TableView> Database::Select(std::vector<TableColumn>& tcs, parser:
         exit(-1);
     }
 
-    /*for (auto row: tables[tName2ind[tableName]].Select(tcs, condWh)) {
-        std::cout << row.Get<int32_t>("id") << ' ' << row.Get<std::string>("login") << std::endl;
-    }*/
     return std::optional<TableView>{tables[tName2ind[tableName]].Select(tcs, condWh)};
 }
 
@@ -164,23 +125,6 @@ std::optional<TableView> Database::Execute(const std::string_view& request) { //
 
     return {};
 }
-
-/*void Execute(const std::string_view& request) { // not void
-    auto res1 = Parser{}.ParseCreate(request, 0, request.size() - 1);
-    auto res2 = Parser{}.ParseInsert(request, 0, request.size() - 1);
-
-    if (res1.first) {
-        std::vector<ColumnType> v1;
-        std::vector<ColumnDescription> v2;
-        for (auto el : res1.second.second.info) {
-            v1.push_back(el.t);
-            v2.push_back(static_cast<ColumnDescription>(el));
-        }
-        CreateTable(res1.second.first, v1, v2);
-    } else {
-        Insert(res2.second.first, res2.second.second.data);
-    }
-}*/
 
 }
 

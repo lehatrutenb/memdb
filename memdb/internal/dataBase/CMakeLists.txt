@@ -1,5 +1,4 @@
 add_library(Memdb_db db.cpp)
-#add_executable(Memdb_db db.cpp)
 add_dependencies(Memdb_db type column table parser)
 target_link_libraries(Memdb_db parser type column table)
 option(EnableCoverage "Set on if want to collect coverage info" OFF)

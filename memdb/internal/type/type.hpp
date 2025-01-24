@@ -130,18 +130,6 @@ public:
         return v[ind];
     }
 
-/*
-    std::unordered_map<ssize_t, T>::iterator getp(ssize_t ind) {
-        // throw ex if not exist
-        auto it = v.find(ind);
-        if (it == v.end()) {
-            throw std::runtime_error("error");
-        }
-        //return static_cast<void*>(&v[ind]);
-        return it;
-    }
-    */
-
     void get(std::vector<ssize_t> inds, std::vector<T>& res) {
         res.reserve(inds.size());
         for (ssize_t i : inds) {
@@ -294,7 +282,6 @@ public:
     bool operator==(const TableColumn& other) const;
 };
 
-//template std::string getValue<parser::Tokenizer::StringT, std::string>(std::shared_ptr<DbType> x);
 template<typename T, typename U>
 U getValue(std::shared_ptr<DbType> x) {
     return dynamic_cast<T*>(x.get())->x;

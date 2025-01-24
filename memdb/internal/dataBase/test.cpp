@@ -5,11 +5,7 @@
 #include <vector>
 #include <string>
 
-//#include "../../internal/dataBase/db.hpp"
 #include "db.hpp"
-//#include "../../internal/parser/parser.hpp"
-//#include "../../internal/parser/lexer.hpp"
-//#define DEBUG
 
 // TODO add check brackets with lots of them (but no need - alg is fixed and don't rely on them amt +-)
 using namespace memdb;

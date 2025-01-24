@@ -4,15 +4,7 @@
 #include <numeric>
 #include <iostream>
 
-// it is not really max size - just size that will be allocated since start
 namespace memdb {
-
-/*
-void*& TableView::Row::operator[](ssize_t ind) {
-    return data[ind];
-}
-*/
-
 
 TableView::Iterator::Iterator(std::vector<Row>::iterator now_) : now(now_)  {}
 
@@ -20,7 +12,7 @@ TableView::Iterator::reference TableView::Iterator::operator*() {
     return *now;
 }
 TableView::Iterator::pointer TableView::Iterator::operator->() {
-    return &(*now); // TODO ???? is it correct
+    return &(*now);
 }
 TableView::Iterator& TableView::Iterator::operator++() {
     now++;
@@ -53,7 +45,7 @@ Table::Value::Value(const std::shared_ptr<DbType>& fValue_) : fValue(fValue_) {}
 Table::Value::Value(const std::string& fName_, const std::shared_ptr<DbType>& fValue_) : fName(fName_), fValue(fValue_) {};
 
 Table::Table(const std::string_view& tName_) : tName(tName_){};
-void Table::AddColumn(const ColumnFullDescription& descr) { // nullptr
+void Table::AddColumn(const ColumnFullDescription& descr) {
     if (name2Ind.find(descr.name) != name2Ind.end()) {
         throw std::runtime_error("error");
         exit(-1); // throw exc
@@ -156,9 +148,6 @@ bool Table::checkCondNeed(std::vector<TableColumn>& need) {
             throw std::runtime_error("error");
             exit(-1);
         }
-        /*if (tc.table == "") {
-            tc.table = tName;
-        }*/ // not try to set table to have simular "" in both leaf cond and need tablecolumn
     }
     return true;
 }
@@ -172,10 +161,7 @@ ssize_t Table::where(parser::Condition& cond) {
     isFine.resize(columns[0]->MaxInd());
     ssize_t fineAmt = 0;
     bool gotFineInds = false;
-    // and are there wait to write base loop
-    for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
-    //for (auto ind : *columns[0]) { // CARE it is safe cause we don't delete full colums and each col must have simular size
-        ssize_t ind = *it;
+    for (auto ind : *columns[0]) { // CARE it is safe cause we don't delete full colums and each col must have simular size
         for (auto& tc : need) {
             vals[tc] = columns[name2Ind[tc.column]]->Get(ind);
             vals[TableColumn(std::pair<std::string, std::string>{"", tc.column})] = vals[tc]; // try to set if table wasn't spec
@@ -203,9 +189,7 @@ void Table::Update(parser::Assignments& as, parser::Condition& condWh) {
                                             // а хотим задать порядок - надо убрать массив и после каждого получения знач пересчитывать
 
     bool gotFineInds = false;
-    // and are there wait to write base loop
-    for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
-        ssize_t ind = *it;
+    for (auto ind : *columns[0]) { // CARE it is safe cause we don't delete full colums and each col must have simular size
         if (!isFine[ind]) {
             continue;
         }
@@ -233,16 +217,8 @@ void Table::Delete(parser::Condition& condWh) {
     where(condWh);
 
     bool gotFineInds = false;
-    // and are there wait to write base loop
     std::vector<ssize_t> inds;
     columns[0]->getInds(inds);
-    /*for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
-        ssize_t ind = *it;
-        if (!isFine[ind]) {
-            continue;
-        }
-        inds.push_back(ind);
-    }*/
 
     for (auto ind : inds) { // CARE it is safe cause we don't delete full colums and each col must have simular size
         if (!isFine[ind]) {
@@ -254,8 +230,6 @@ void Table::Delete(parser::Condition& condWh) {
     }
 }
 
-//TableView(std::map<std::string, sssize_t>& col2ind_, std::vector<Row> columns_): col2ind(col2ind_), columns(columns_)  {}
-// Row(std::map<std::string, sssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
 TableView Table::Select(const std::vector<TableColumn>& tcs, parser::Condition& condWh) {
     ssize_t rowAmt = where(condWh);
     ssize_t colAmt = 0;
@@ -281,32 +255,15 @@ TableView Table::Select(const std::vector<TableColumn>& tcs, parser::Condition& 
         curCol2ind[tc.column] = colInd;
         tableViewColumns[colInd++] = columns[name2Ind[tc.column]]->GetP();
     }
-    // Row(std::map<std::string_view, sssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
-    //Row(std::map<std::string_view, sssize_t>& col2ind_, std::vector<void*> data_) : col2ind(col2ind_), data(data_){};
-    //std::vector<TableView::Row> data(rowAmt, TableView::Row(name2Ind, std::vector<ssize_t> (colAmt)));
+
     std::vector<ssize_t> inds;
     inds.reserve(rowAmt);
-    //ssize_t curInd = 0;
-    for (auto it = columns[0]->begin(); it != columns[0]->end(); it++) { // CARE it is safe cause we don't delete full colums and each col must have simular size
-        ssize_t ind = *it;
+    for (auto ind : *columns[0]) { // CARE it is safe cause we don't delete full colums and each col must have simular size
         if (!isFine[ind]) {
             continue;
         }
         inds.emplace_back(ind);
-        
-        /*colInd = 0;
-        for (const auto& tc : tcs) {
-            if (tc.table != tName) {
-                continue;
-            }
-            //data[curInd][colInd] = columns[name2Ind[tc.column]]->GetP(ind);
-            data[curInd][colInd] = columns[name2Ind[tc.column]]->GetP(ind);
-            colInd++;
-        }
-        curInd++;*/
     }
-    //auto res = TableView(name2Ind, data);
-    //std::cout <<&data << ' ' << &res.columns << ' ' << &res.columns[0] << ' ' << &res.col2ind << ' ' << &name2Ind << std::endl;
     return TableView(curCol2ind, inds, tableViewColumns);
 }
 

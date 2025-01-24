@@ -18,17 +18,6 @@ void Assignments::Add(ColumnExp cexp) {
     As.emplace_back(cexp);
 }
 
-
-
-/*
-if (inp[l]->GetType() != Tokenizer::TokenT::BRACKET || inp[r]->GetType() != Tokenizer::TokenT::BRACKET) {
-            return false;
-        }
-        if (getValue<Tokenizer::BracketT, lexer::Bracket>(inp[l]) != bo) {
-            return false;
-        }
-
-*/
 Assignments AssignmentsParser::Parse(const std::vector<std::shared_ptr<Tokenizer::Token>>& inp, ssize_t l, ssize_t r) {
     Assignments res;
 

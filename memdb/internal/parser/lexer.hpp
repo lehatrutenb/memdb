@@ -55,13 +55,6 @@ namespace lexer {
         COMMA
     };
 
-   /*enum class ColumnType {
-        INT32,
-        BOOL,
-        BYTES,
-        STRING
-    };*/
-
     static std::map<std::string_view, Command> s2c = {
         {"create", Command::CREATE}, {"insert", Command::INSERT}, {"select", Command::SELECT}, {"update", Command::UPDATE}, {"delete", Command::DELETE}, 
         {"join", Command::JOIN}
